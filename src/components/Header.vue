@@ -1,12 +1,13 @@
 <template>
   <header class="bg-blue-600 text-white p-4 flex justify-between items-center">
     <div class="text-xl font-bold">LOGO</div>
-    <nav>
-      <ul class="flex space-x-4">
+    <nav class="flex-1">
+      <ul class="flex space-x-6">
         <li><a href="#" class="hover:underline">首页</a></li>
-        <li><a href="#" class="hover:underline">产品</a></li>
-        <li><a href="#" class="hover:underline">关于</a></li>
-        <li><a href="#" class="hover:underline">联系</a></li>
+        <li><a href="#" class="hover:underline">余量查询</a></li>
+        <li><a href="#" class="hover:underline">助手总览</a></li>
+        <li><a href="#" class="hover:underline">会员</a></li>
+        <li><a href="#" class="hover:underline">登录</a></li>
       </ul>
     </nav>
   </header>
