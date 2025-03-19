@@ -6,7 +6,6 @@
         <li><a href="#" class="hover:underline">首页</a></li>
         <li><a href="#" class="hover:underline">余量查询</a></li>
         <li><a href="#" class="hover:underline">助手总览</a></li>
-        <li><a href="#" class="hover:underline">会员</a></li>
         <li><a href="#" class="hover:underline">登录</a></li>
       </ul>
     </nav>
