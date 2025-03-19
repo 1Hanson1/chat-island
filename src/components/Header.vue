@@ -14,8 +14,10 @@
 </template>
 
 <script>
+import { ref } from 'vue'
+
 export default {
-  name: "Header"
+  name: "Header",
 };
 </script>
 
