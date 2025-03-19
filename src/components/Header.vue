@@ -4,8 +4,9 @@
     <nav class="flex-shrink-0">
       <ul class="flex gap-8">
         <li><a href="#" class="hover:underline">首页</a></li>
-        <li><a href="#" class="hover:underline">余量查询</a></li>
-        <li><a href="#" class="hover:underline">助手总览</a></li>
+        <li><a href="#" class="hover:underline">余量</a></li>
+        <li><a href="#" class="hover:underline">助手</a></li>
+        <li><a href="#" class="hover:underline">购买</a></li>
         <li><a href="#" class="hover:underline">登录</a></li>
       </ul>
     </nav>
