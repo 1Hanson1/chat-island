@@ -16,7 +16,7 @@
     
   <script>
   export default {
-    name: "SidebarRight",
+    name: "ChatHistory",
     data() {
       return {
         menus: ["菜单1", "菜单2", "菜单3", "菜单4"]

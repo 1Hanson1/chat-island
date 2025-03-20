@@ -7,7 +7,7 @@
   
   <script>
   export default {
-    name: "MainContent"
+    name: "ChatMainContent"
   };
   </script>
   
