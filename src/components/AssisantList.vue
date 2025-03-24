@@ -1,3 +1,18 @@
+<script setup>
+import { ref } from "vue";
+
+const menus = ref(["菜单1", "菜单2", "菜单3", "菜单4"]);
+
+function addMenu() {
+  const newMenu = `菜单${menus.value.length + 1}`;
+  menus.value.push(newMenu);
+}
+
+function deleteMenu(index) {
+  menus.value.splice(index, 1);
+}
+</script>
+
 <template>
   <aside class="bg-gray-200 w-64 p-4">
     <ul>
@@ -13,26 +28,6 @@
     </button>
   </aside>
 </template>
-  
-<script>
-export default {
-  name: "AssisantList",
-  data() {
-    return {
-      menus: ["菜单1", "菜单2", "菜单3", "菜单4"]
-    };
-  },
-  methods: {
-    addMenu() {
-      const newMenu = `菜单${this.menus.length + 1}`;
-      this.menus.push(newMenu);
-    },
-    deleteMenu(index) {
-      this.menus.splice(index, 1);
-    }
-  }
-};
-</script>
   
 <style scoped></style>
   

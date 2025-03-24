@@ -2,6 +2,7 @@
   <div class="flex flex-col h-screen">
     <Header />
     <div class="flex flex-1">
+      <LeftSmallList />
       <AssisantList />
       <ChatMainContent />
       <ChatHistory />
@@ -11,12 +12,13 @@
 
 <script>
 import Header from './components/Header.vue';
+import LeftSmallList from './components/LeftSmallList.vue';
 import AssisantList from './components/AssisantList.vue';
 import ChatMainContent from './components/ChatMainContent.vue';
 import ChatHistory from './components/ChatHistory.vue';
 
 export default {
-  components: { Header, AssisantList, ChatMainContent, ChatHistory }
+  components: { Header, LeftSmallList,AssisantList, ChatMainContent, ChatHistory }
 };
 </script>
 

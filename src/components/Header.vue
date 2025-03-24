@@ -13,12 +13,4 @@
   </header>
 </template>
 
-<script>
-import { ref } from 'vue'
-
-export default {
-  name: "Header",
-};
-</script>
-
 <style scoped></style>
