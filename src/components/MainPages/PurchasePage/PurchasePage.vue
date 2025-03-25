@@ -8,8 +8,8 @@
 </template>
 
 <script>
-import Header from '../Header.vue';
-import LeftSmallList from '../LeftSmallList.vue';
+import Header from '../../PublicComponents/Header.vue';
+import LeftSmallList from '../../PublicComponents/LeftSmallList.vue';
 
 export default {
   components: { Header, LeftSmallList}

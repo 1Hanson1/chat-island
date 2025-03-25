@@ -3,24 +3,24 @@ import { ref } from 'vue'
 
 const items = ref([
     {
-        name: 'Home',
-        imgage: 'home',
-        link: '/'
+        name: 'QuickCreate',
+        imgage: 'QuickCreate',
+        link: '/quickCreate'
     },
     {
-        name: 'Discover',
-        image: 'compass',
-        link: '/discover'
+        name: 'SourceGoDown',
+        image: 'SourceGoDown',
+        link: '/sourceGoDown'
     },
     {
-        name: 'Profile',
-        image: 'user',
-        link: '/profile'
+        name: 'ChatWithPeople',
+        image: 'ChatWithPeople',
+        link: '/chatWithPeople'
     },
     {
-        name: 'Messages',
-        image: 'envelope',
-        link: '/messages'
+        name: 'HelpWord',
+        image: 'HelpWord',
+        link: '/helpWord'
     },
 ])
 </script>

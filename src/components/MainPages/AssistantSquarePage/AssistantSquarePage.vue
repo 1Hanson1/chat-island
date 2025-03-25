@@ -7,9 +7,9 @@
   </div>
 </template>
 
-<script>
-import Header from '../Header.vue';
-import LeftSmallList from '../LeftSmallList.vue';
+<script>  
+import Header from '../../PublicComponents/Header.vue';
+import LeftSmallList from '../../PublicComponents/LeftSmallList.vue';
 
 export default {
   components: { Header, LeftSmallList}

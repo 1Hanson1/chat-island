@@ -11,11 +11,11 @@
 </template>
 
 <script>
-import Header from '../Header.vue';
-import LeftSmallList from '../LeftSmallList.vue';
-import AssistantList from '../AssistantList.vue';
-import ChatMainContent from '../ChatMainContent.vue';
-import ChatHistory from '../ChatHistory.vue';
+import Header from '../../PublicComponents/Header.vue';
+import LeftSmallList from '../../PublicComponents/LeftSmallList.vue';
+import AssistantList from './AssistantList.vue';
+import ChatMainContent from './ChatMainContent.vue';
+import ChatHistory from './ChatHistory.vue';
 
 export default {
   components: { Header, LeftSmallList, AssistantList, ChatMainContent, ChatHistory }
