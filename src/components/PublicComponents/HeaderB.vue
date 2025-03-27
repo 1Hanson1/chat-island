@@ -1,7 +1,3 @@
-<script setup>
-      
-</script>
-
 <template>
     <header class="bg-blue-600 text-white p-4 flex justify-between items-center">
       <div class="text-xl font-bold">LOGO</div>
@@ -16,6 +12,6 @@
       </nav>
     </header>
   </template>
-  
+
   <style scoped></style>
   
