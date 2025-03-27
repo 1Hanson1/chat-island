@@ -5,22 +5,22 @@ const items = ref([
     {
         name: 'QuickCreate',
         imgage: 'QuickCreate',
-        link: '/quickCreate'
+        link: '/login'
     },
     {
         name: 'SourceGoDown',
         image: 'SourceGoDown',
-        link: '/sourceGoDown'
+        link: '/login'
     },
     {
         name: 'ChatWithPeople',
         image: 'ChatWithPeople',
-        link: '/chatWithPeople'
+        link: '/login'
     },
     {
         name: 'HelpWord',
         image: 'HelpWord',
-        link: '/helpWord'
+        link: '/login'
     },
 ])
 </script>

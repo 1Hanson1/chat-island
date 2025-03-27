@@ -9,6 +9,7 @@ import QuickCreate from '../components/MainPages/QuickCreateAssistantPage/QuickC
 import SourceGoDown from '../components/MainPages/SourceGoDownPage/SourceGoDownPage.vue';
 import ChatWithPeople from '../components/MainPages/ChatWithPeoplePage/ChatWithPeoplePage.vue';
 import HelpWord from '../components/MainPages/HelpWordPage/HelpWordPage.vue';
+import PersonalPage from '../components/MainPages/PersonalPage/PersonalPage.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -23,6 +24,7 @@ const router = createRouter({
     { path: '/sourceGoDown', name: 'SourceGoDown', component: SourceGoDown },
     { path: '/chatWithPeople', name: 'ChatWithPeople', component: ChatWithPeople },
     { path: '/helpWord', name: 'HelpWord', component: HelpWord },
+    { path: '/personalPage', name: 'PersonalPage', component: PersonalPage }
   ],
 });
 
