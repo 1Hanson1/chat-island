@@ -7,8 +7,8 @@
           <div class ="w-2/3">
             <LoginInstruction />
           </div>
-          <div class="w-1/3 shadow-lg" >
-            <LoginUser />
+          <div class="w-1/3 shadow-lg">
+            <LoginUser/>
           </div>
       </div>
     </div>
@@ -26,4 +26,6 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+
+</style>

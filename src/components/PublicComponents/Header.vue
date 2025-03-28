@@ -1,6 +1,6 @@
 <template>
   <header class="bg-blue-600 text-white p-4 flex justify-between items-center">
-    <div class="text-xl font-bold">LOGO</div>
+    <icon size="24"><Money16Regular /></icon>
     <nav class="flex-shrink-0">
       <ul class="flex gap-8">
         <li><router-link to="/home" class="hover:underline">首页</router-link></li>
@@ -12,5 +12,17 @@
     </nav>
   </header>
 </template>
+
+<script> 
+  import { Money16Regular } from '@vicons/fluent'
+  import { Icon } from '@vicons/utils'
+  export default {
+    name: 'Header',
+    components: {
+      Money16Regular,
+      Icon
+    },
+  }
+</script>
 
 <style scoped></style>

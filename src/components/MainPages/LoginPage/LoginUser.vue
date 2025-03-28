@@ -2,29 +2,27 @@
 import { ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import { NInput } from 'naive-ui';
+import { setAuthenticated } from '../../../router/index.js';
 
 const username = ref('');
 const password = ref('');
 const router = useRouter();
 
 function handleLogin() {
-    // 检查用户名和密码是否都有内容
     if (username.value && password.value) {
         // 在这里处理登录逻辑
         console.log('用户名:', username.value);
         console.log('密码:', password.value);
-
-        // 导航到 /home
+        setAuthenticated(true);
         router.push('/home');
     } else {
-        // 显示错误信息或阻止导航
         alert('用户名和密码都必须填写');
     }
 }
 </script>
 
 <template>
-    <div class="login-user flex flex-col items-center h-screen">
+    <div class="flex flex-col items-center w-full h-full">
         <div class="bg-white p-8 rounded-lg shadow-lg w-96 mt-[20vh]">
             <h2 class="text-2xl font-bold mb-6 text-center">登录</h2>
             <form @submit.prevent="handleLogin" class="space-y-4">
