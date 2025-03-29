@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import { NInput } from 'naive-ui';
-import { setAuthenticated } from '../../../router/index.js';
+import { setIsAuthenticated } from '../../../router';
 
 const username = ref('');
 const password = ref('');
@@ -13,7 +13,7 @@ function handleLogin() {
         // 在这里处理登录逻辑
         console.log('用户名:', username.value);
         console.log('密码:', password.value);
-        setAuthenticated(true);
+        setIsAuthenticated(true);
         router.push('/home');
     } else {
         alert('用户名和密码都必须填写');

@@ -14,7 +14,10 @@ function deleteMenu(index) {
 </script>
 
 <template>
-  <aside class="bg-gray-200 w-64 p-4">
+  <aside class="bg-gray-300 w-80 ">
+    <div class="flex items-center justify-center bg-gray-200 h-15">
+          <h2 class="text-xl font-bold mt-2">助手列表</h2>
+        </div>
     <ul>
       <li v-for="(menu, index) in menus" :key="index" class="p-2 hover:bg-gray-300 flex justify-between items-center group">
         <a href="#">{{ menu }}</a>

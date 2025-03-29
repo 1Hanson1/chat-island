@@ -13,7 +13,7 @@ import PersonalPage from '../components/MainPages/PersonalPage/PersonalPage.vue'
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: [
+  routes: [ 
     { path: '/', name: 'HomeB', component: HomeB },
     { path: '/home', name: 'Home', component: Home, meta: { requiresAuth: true } },
     { path: '/check', name: 'Check', component: Check, meta: { requiresAuth: true } },
@@ -46,7 +46,7 @@ router.beforeEach((to, from, next) => {
 });
 
 // 提供一个方法来设置登录状态
-export function setAuthenticated(value) {
+export function setIsAuthenticated(value) {
   isAuthenticated = value;
 }
 
