@@ -9,7 +9,9 @@ import QuickCreate from '../components/MainPages/QuickCreateAssistantPage/QuickC
 import SourceGoDown from '../components/MainPages/SourceGoDownPage/SourceGoDownPage.vue';
 import ChatWithPeople from '../components/MainPages/ChatWithPeoplePage/ChatWithPeoplePage.vue';
 import HelpWord from '../components/MainPages/HelpWordPage/HelpWordPage.vue';
-import PersonalPage from '../components/MainPages/PersonalPage/PersonalPage.vue';
+import PersonalInfoPage from '../components/MainPages/PersonalPage/PersonalInfoPage.vue';
+import PersonalStatisticPage from '../components/MainPages/PersonalPage/PersonalStatisticPage.vue';
+import { useAuthStore } from '../stores/authStore';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -24,30 +26,26 @@ const router = createRouter({
     { path: '/sourceGoDown', name: 'SourceGoDown', component: SourceGoDown, meta: { requiresAuth: true } },
     { path: '/chatWithPeople', name: 'ChatWithPeople', component: ChatWithPeople, meta: { requiresAuth: true } },
     { path: '/helpWord', name: 'HelpWord', component: HelpWord, meta: { requiresAuth: true } },
-    { path: '/personalPage', name: 'PersonalPage', component: PersonalPage, meta: { requiresAuth: true } }
+    { path: '/personalPage', name: 'PersonalPage', component: PersonalInfoPage, meta: { requiresAuth: true } },
+    { path: '/personalStatisticPage', name: 'PersonalStatisticPage', component: PersonalStatisticPage, meta: { requiresAuth: true } }
   ],
 });
 
 // 使用导航守卫来检查登录状态
-let isAuthenticated = false;
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!isAuthenticated) {
-      next({
-        path: '/login',
-        query: { redirect: to.fullPath }
-      });
-    } else {
-      next();
-    }
-  } else {
-    next();
+  const authStore = useAuthStore()
+  const isAuthenticated = authStore.isAuthenticated
+  
+  if(to.path === '/' || to.path === '/login'){
+    authStore.logout()
   }
-});
+
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    next('/login')
+  } else {
+    next()
+  }
+})
 
 // 提供一个方法来设置登录状态
-export function setIsAuthenticated(value) {
-  isAuthenticated = value;
-}
-
 export default router;

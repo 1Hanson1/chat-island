@@ -2,18 +2,17 @@
 import { ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import { NInput } from 'naive-ui';
-import { setIsAuthenticated } from '../../../router';
+import { useAuthStore } from '../../../stores/authStore';
 
 const username = ref('');
 const password = ref('');
 const router = useRouter();
+const authStore = useAuthStore();
 
 function handleLogin() {
     if (username.value && password.value) {
-        // 在这里处理登录逻辑
-        console.log('用户名:', username.value);
-        console.log('密码:', password.value);
-        setIsAuthenticated(true);
+        authStore.login(username.value);
+        localStorage.setItem('isAuthenticated', 'true');
         router.push('/home');
     } else {
         alert('用户名和密码都必须填写');
