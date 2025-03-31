@@ -2,15 +2,15 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomeB from '../components/MainPages/HomeBeforeLoginPage/HomeBeforeLoginPage.vue';
 import Home from '../components/MainPages/HomeAfterLoginPage/HomeAfterLoginPage.vue';
 import Check from '../components/MainPages/CheckHavePage/CheckHavePage.vue';
-import AssistantSquare from '../components/MainPages/AssistantSquarePage/AssistantSquarePage.vue';
+import AssistantSquareMain from '../components/MainPages/AssistantSquarePage/AssistantSquareMainPage.vue';
 import Purchase from '../components/MainPages/PurchasePage/PurchasePage.vue';
 import Login from '../components/MainPages/LoginPage/LoginPage.vue';
 import QuickCreate from '../components/MainPages/QuickCreateAssistantPage/QuickCreateAssistantPage.vue';
 import SourceGoDown from '../components/MainPages/SourceGoDownPage/SourceGoDownPage.vue';
 import ChatWithPeople from '../components/MainPages/ChatWithPeoplePage/ChatWithPeoplePage.vue';
 import HelpWord from '../components/MainPages/HelpWordPage/HelpWordPage.vue';
-import PersonalInfoPage from '../components/MainPages/PersonalPage/PersonalInfoPage.vue';
-import PersonalStatisticPage from '../components/MainPages/PersonalPage/PersonalStatisticPage.vue';
+import PersonalInfo from '../components/MainPages/PersonalPage/PersonalInfoPage.vue';
+import PersonalStatistic from '../components/MainPages/PersonalPage/PersonalStatisticPage.vue';
 import { useAuthStore } from '../stores/authStore';
 
 const router = createRouter({
@@ -19,15 +19,15 @@ const router = createRouter({
     { path: '/', name: 'HomeB', component: HomeB },
     { path: '/home', name: 'Home', component: Home, meta: { requiresAuth: true } },
     { path: '/check', name: 'Check', component: Check, meta: { requiresAuth: true } },
-    { path: '/assistantSquare', name: 'AssistantSquare', component: AssistantSquare, meta: { requiresAuth: true } },
+    { path: '/assistantSquareMain', name: 'AssistantSquareMain', component: AssistantSquareMain, meta: { requiresAuth: true } },
     { path: '/purchase', name: 'Purchase', component: Purchase, meta: { requiresAuth: true } },
     { path: '/login', name: 'Login', component: Login },
     { path: '/quickCreate', name: 'QuickCreate', component: QuickCreate, meta: { requiresAuth: true } },
     { path: '/sourceGoDown', name: 'SourceGoDown', component: SourceGoDown, meta: { requiresAuth: true } },
     { path: '/chatWithPeople', name: 'ChatWithPeople', component: ChatWithPeople, meta: { requiresAuth: true } },
     { path: '/helpWord', name: 'HelpWord', component: HelpWord, meta: { requiresAuth: true } },
-    { path: '/personalPage', name: 'PersonalPage', component: PersonalInfoPage, meta: { requiresAuth: true } },
-    { path: '/personalStatisticPage', name: 'PersonalStatisticPage', component: PersonalStatisticPage, meta: { requiresAuth: true } }
+    { path: '/personalInfo', name: 'PersonalInfo', component: PersonalInfo, meta: { requiresAuth: true } },
+    { path: '/personalStatistic', name: 'PersonalStatistic', component: PersonalStatistic, meta: { requiresAuth: true } }
   ],
 });
 
