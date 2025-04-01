@@ -7,7 +7,7 @@
         <li><router-link to="/check"  class="hover:underline">余量</router-link></li>
         <li><router-link to="/assistantSquareMain"  class="hover:underline">助手</router-link></li>
         <li><router-link to="/purchase"  class="hover:underline">购买</router-link></li>
-        <li><router-link to="/personalInfo"  class="hover:underline">个人</router-link></li>
+        <li><router-link to="/personal/Info"  class="hover:underline">个人</router-link></li>
       </ul>
     </nav>
   </header>

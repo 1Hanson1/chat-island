@@ -3,6 +3,7 @@
     <Header />
     <div class="flex flex-1">
       <LeftSmallList />
+      <PersonalLeftList />
       <div class="flex-1 p-8">
         <n-card title="个人信息" class="max-w-2xl mx-auto">
           <div class="grid grid-cols-2 gap-6">
@@ -123,14 +124,15 @@ import Header from '../../PublicComponents/Header.vue';
 import LeftSmallList from '../../PublicComponents/LeftSmallList.vue';
 import { defineComponent, ref } from 'vue';
 import { useAuthStore } from '../../../stores/authStore';
+import PersonalLeftList from './PersonalLeftList.vue';
 import {
   NCard,
   NAvatar,
   NButton,
   NModal,
   NForm,
-  NFormItem,
   NInput,
+  NFormItem
 } from 'naive-ui';
 import router from '../../../router';
 
@@ -138,13 +140,14 @@ export default defineComponent({
   components: {
     Header,
     LeftSmallList,
+    PersonalLeftList,
     NCard,
     NAvatar,
     NButton,
     NModal,
     NForm,
-    NFormItem,
     NInput,
+    NFormItem
   },
   setup() {
     const authStore = useAuthStore();
