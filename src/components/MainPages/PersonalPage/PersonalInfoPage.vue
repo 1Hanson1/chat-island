@@ -17,17 +17,16 @@
                 <p class="text-lg">{{ userInfo.email }}</p>
               </div>
               <div>
+                <h3 class="text-gray-500 text-sm font-medium">会员状态</h3>
+                <p class="text-lg">{{ userInfo.isMember }}</p>
+              </div>
+              <div>
                 <h3 class="text-gray-500 text-sm font-medium">注册时间</h3>
                 <p class="text-lg">{{ userInfo.registerDate }}</p>
               </div>
             </div>
-            <div class="flex justify-center">
-              <n-avatar
-                round
-                size="large"
-                :src="userInfo.avatar"
-                class="w-32 h-32"
-              />
+            <div class="flex justify-center items-center">
+              <img :src="userInfo.avatar" alt="" class="w-32 h-32 rounded-full" />
             </div>
           </div>
           
@@ -155,8 +154,9 @@ export default defineComponent({
     const userInfo = ref({
       username: '张三',
       email: 'zhangsan@example.com',
+      isMember: '高级会员',
       registerDate: '2023-01-15',
-      avatar: 'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg'
+      avatar: '/pics/avatar.png'
     });
 
     const editForm = ref({
