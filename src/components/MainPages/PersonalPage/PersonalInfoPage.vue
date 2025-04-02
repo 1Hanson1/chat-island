@@ -155,7 +155,7 @@ export default defineComponent({
       username: '张三',
       email: 'zhangsan@example.com',
       isMember: '高级会员',
-      registerDate: '2023-01-15',
+      registerDate: '2025-03-01',
       avatar: '/pics/avatar.png'
     });
 

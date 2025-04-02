@@ -31,6 +31,6 @@ import { RouterLink } from 'vue-router'
     margin-bottom: 1rem;
 }
 .list-section {
-    margin-bottom: 1rem;
+    margin-bottom: 1.2rem;
 }
 </style>
