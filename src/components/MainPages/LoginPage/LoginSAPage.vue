@@ -8,7 +8,7 @@
             <LoginInstruction />
           </div>
           <div class="w-1/3 shadow-lg bg-blue-50">
-            <LoginUser/>
+            <LoginSA/>
           </div>
       </div>
     </div>
@@ -19,10 +19,10 @@
 import HeaderB from '../../PublicComponents/HeaderB.vue';
 import LeftSmallListB from '../../PublicComponents/LeftSmallListB.vue';
 import LoginInstruction from './LoginInstruction.vue';
-import LoginUser from './LoginUser.vue';
+import LoginSA from './LoginSA.vue';
 
 export default {
-  components: { HeaderB, LeftSmallListB, LoginUser, LoginInstruction }
+  components: { HeaderB, LeftSmallListB, LoginSA, LoginInstruction }
 };
 </script>
 

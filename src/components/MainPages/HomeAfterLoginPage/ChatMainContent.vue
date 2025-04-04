@@ -1,10 +1,27 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import { storeToRefs } from 'pinia'
+import { useAssistantStore } from '../../../stores/assistantStore'
+
+const assistantStore = useAssistantStore()
+const {currentAssistant } = storeToRefs(assistantStore)
 
 const messages = ref([
-  { text: '你好！我是AI助手，有什么可以帮您的吗？', sender: 'ai' }
-]);
-const newMessage = ref('');
+  { text: `你好！我是${currentAssistant.value?.name || 'AI助手'}，有什么可以帮您的吗？`, sender: 'ai' }
+])
+const newMessage = ref('')
+
+watch(currentAssistant, (newVal) => {
+  if (newVal) {
+    resetMessagesForAssistant(newVal)
+  }
+})
+
+function resetMessagesForAssistant(assistant) {
+  messages.value = [
+    { text: `你好！我是${assistant.name}，有什么可以帮您的吗？`, sender: 'ai' }
+  ]
+}
 
 function sendMessage() {
   if (!newMessage.value.trim()) return;
@@ -27,8 +44,10 @@ function sendMessage() {
 
 <template>
   <main class="flex-1 flex flex-col h-full">
-    <h1 class="bg-blue-300 text-gray-800 p-4 text-xl font-bold">AI 对话助手</h1>
-    <div class="chat-content flex-1 overflow-y-auto mb-4 space-y-4 p-4">
+    <h1 class="bg-blue-300 text-gray-800 p-4 text-xl font-bold">
+      {{ currentAssistant?.name || 'AI 对话助手' }}
+    </h1>
+    <div v-if="currentAssistant" class="chat-content flex-1 overflow-y-auto mb-4 space-y-4 p-4">
       <div 
         v-for="(message, index) in messages" 
         :key="index"
@@ -47,8 +66,11 @@ function sendMessage() {
         </div>
       </div>
     </div>
+    <div v-else class="flex items-center justify-center h-full">
+      <p>请从左侧选择助手</p>
+    </div>
     
-    <div class="flex gap-2 p-4">
+    <div v-if="currentAssistant" class="flex gap-2 p-4">
       <input
         v-model="newMessage"
         @keyup.enter="sendMessage"

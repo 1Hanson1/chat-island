@@ -1,14 +1,19 @@
 <script setup>
 import { ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
-import { NInput } from 'naive-ui';
+import { NInput, NSelect} from 'naive-ui';
 import { useAuthStore } from '../../../stores/authStore';
 
 const username = ref('');
 const password = ref('');
 const router = useRouter();
 const authStore = useAuthStore();
-const role = ref('用户');
+const role = ref('');
+
+const options = [
+    { label: '客服', value: 'customer' },
+    { label: '管理员', value: 'admin' }
+]; // 定义角色选择选项
 
 function handleLogin() {
     if (username.value && password.value) {
@@ -31,6 +36,10 @@ function handleLogin() {
                     <n-input v-model:value="username" type="text" placeholder="用户名" />
                 </div>
                 <div>
+                    <label for="role" class="block text-sm font-medium text-gray-700">角色选择</label>
+                    <n-select v-model:value="role" :options="options" placeholder="请选择角色" />
+                </div>
+                <div>
                     <label for="password" class="block text-sm font-medium text-gray-700">密码</label>
                     <n-input v-model:value="password" type="text" placeholder="密码" />
                 </div>
@@ -43,11 +52,11 @@ function handleLogin() {
                 </button>
 
                 <div>
-                    <router-link to="/register" class="text-blue-600 hover:underline">用户注册</router-link>
+                    <router-link to="/register/SA" class="text-blue-600 hover:underline">客服/管理员注册</router-link>
                 </div>
                 
                 <div>
-                    <router-link to="/login/SA" class="text-blue-600 hover:underline">客服/管理员登录入口</router-link>
+                    <router-link to="/login" class="text-blue-600 hover:underline">用户登录入口</router-link>
                 </div>
             </form>
             
