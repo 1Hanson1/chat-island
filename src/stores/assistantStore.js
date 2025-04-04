@@ -9,6 +9,7 @@ export const useAssistantStore = defineStore('assistant', () => {
       history: [
         {
           id: 1,
+          title: '欢迎使用写作助手',
           message: '你好，我是写作助手，有什么可以帮助您？'
         }
       ],
@@ -19,6 +20,7 @@ export const useAssistantStore = defineStore('assistant', () => {
       history: [
         {
           id: 1,
+          title: '欢迎使用编程助手',
           message: '你好，我是编程助手，有什么可以帮助您？'
         }
       ],
@@ -29,6 +31,7 @@ export const useAssistantStore = defineStore('assistant', () => {
       history: [
         {
           id: 1,
+          title: '欢迎使用学习助手',
           message: '你好，我是学习助手，有什么可以帮助您？'
         }
       ],
