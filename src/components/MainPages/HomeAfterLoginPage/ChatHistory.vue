@@ -9,7 +9,7 @@ const { currentAssistant } = storeToRefs(assistantStore)
 
 <template>
   <aside class="w-80 bg-gray-300 flex flex-col">
-    <div class="bg-gray-200 h-15 flex items-center justify-center">
+    <div class="bg-blue-200 h-15 flex items-center justify-center">
       <h2 class="text-xl font-bold">对话记录</h2>
     </div>
     <div v-if="currentAssistant" class="flex-1 overflow-y-auto">
@@ -18,7 +18,7 @@ const { currentAssistant } = storeToRefs(assistantStore)
         :key="item.id" 
         class="p-4 hover:bg-gray-200"
       >
-        {{ item.message }}
+        {{ item.title }}
       </div>
     </div>
     <div v-else class="flex items-center justify-center h-full">

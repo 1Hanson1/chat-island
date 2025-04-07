@@ -65,9 +65,6 @@ setup() {
         primaryColorPressed: '#3D72D9',
         primaryColorSuppl: '#5B8FF9'
       },
-      Card: {
-        titleTextColor: '#5B8FF9' 
-      },
       Tabs: {
         tabTextColorActive: '#5B8FF9', 
         tabTextColorHover: '#7DA6F9', 

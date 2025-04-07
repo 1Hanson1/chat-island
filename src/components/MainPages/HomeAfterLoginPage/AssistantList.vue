@@ -12,7 +12,7 @@ function selectAssistant(assistant){
 
 <template>
   <aside class="w-80 bg-gray-300 flex flex-col">
-    <div class="bg-gray-200 h-15 flex items-center justify-center">
+    <div class="bg-blue-200  h-15 flex items-center justify-center">
       <h2 class="text-xl font-bold">助手列表</h2>
     </div>
     <div class="flex-1 overflow-y-auto">
