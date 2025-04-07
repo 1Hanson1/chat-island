@@ -16,7 +16,7 @@ const { currentAssistant } = storeToRefs(assistantStore)
       <div 
         v-for="item in currentAssistant.history" 
         :key="item.id" 
-        class="p-4 hover:bg-gray-200"
+        class="p-4 hover:bg-gray-200 list-content"
       >
         {{ item.title }}
       </div>
@@ -36,6 +36,9 @@ const { currentAssistant } = storeToRefs(assistantStore)
 <style scoped>
 .list-title {
   font-size: 1.5rem;
+}
+.list-content {
+  font-size: 1.2rem;
 }
 </style>
     

@@ -32,7 +32,7 @@ function handleLogin() {
                 </div>
                 <div>
                     <label for="password" class="block text-sm font-medium text-gray-700">密码</label>
-                    <n-input v-model:value="password" type="text" placeholder="密码" />
+                    <n-input v-model:value="password" type="password" placeholder="密码" />
                 </div>
                 <br/>
                 <button

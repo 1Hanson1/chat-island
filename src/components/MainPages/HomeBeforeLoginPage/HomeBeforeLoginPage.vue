@@ -31,7 +31,7 @@
   import ChatMainContent from '../HomeAfterLoginPage/ChatMainContent.vue';
   
   export default {
-    components: { HeaderB, LeftSmallListB, ChatMainContent}
+    components: { HeaderB, LeftSmallListB, ChatMainContent},
   };
   </script>
   

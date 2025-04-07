@@ -13,7 +13,7 @@ function selectAssistant(assistant){
 <template>
   <aside class="w-80 bg-gray-300 flex flex-col">
     <div class="bg-blue-200  h-15 flex items-center justify-center">
-      <h2 class="text-xl font-bold">助手列表</h2>
+      <h2 class="list-title font-bold">助手列表</h2>
     </div>
     <div class="flex-1 overflow-y-auto">
       <div 
@@ -23,7 +23,7 @@ function selectAssistant(assistant){
         @click="selectAssistant(assistant)"
         :class="{ 'bg-gray-200': assistant.id === currentAssistant?.id }"
       >
-        <span>{{ assistant.name }}</span>
+        <span class="list-content">{{ assistant.name }}</span>
         <div class="opacity-0 hover:opacity-100 transition-opacity duration-200">
           <button class="ml-2 text-gray-500 hover:text-gray-700">
             设置
@@ -41,5 +41,11 @@ function selectAssistant(assistant){
 </template>
   
 <style scoped>
+.list-title {
+  font-size: 1.5rem;
+}
+.list-content {
+  font-size: 1.2rem;
+}
 </style>
   

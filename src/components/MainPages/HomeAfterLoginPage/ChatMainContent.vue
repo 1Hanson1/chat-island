@@ -4,7 +4,7 @@ import { storeToRefs } from 'pinia'
 import { useAssistantStore } from '../../../stores/assistantStore'
 
 const assistantStore = useAssistantStore()
-const {currentAssistant } = storeToRefs(assistantStore)
+const { currentAssistant } = storeToRefs(assistantStore)
 
 const messages = ref([
   { text: `你好！我是${currentAssistant.value?.name || 'AI助手'}，有什么可以帮您的吗？`, sender: 'ai' }
@@ -17,6 +17,7 @@ watch(currentAssistant, (newVal) => {
   }
 })
 
+//重置
 function resetMessagesForAssistant(assistant) {
   messages.value = [
     { text: `你好！我是${assistant.name}，有什么可以帮您的吗？`, sender: 'ai' }

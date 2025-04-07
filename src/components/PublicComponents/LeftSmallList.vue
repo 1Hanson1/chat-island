@@ -1,38 +1,19 @@
 <script setup>
 import { ref } from 'vue'
-
-const items = ref([
-    {
-        name: 'QuickCreate',
-        imgage: 'QuickCreate',
-        link: '/quickCreate'
-    },
-    {
-        name: 'SourceGoDown',
-        image: 'SourceGoDown',
-        link: '/sourceGoDown'
-    },
-    {
-        name: 'ChatWithPeople',
-        image: 'ChatWithPeople',
-        link: '/chatWithPeople'
-    },
-    {
-        name: 'HelpWord',
-        image: 'HelpWord',
-        link: '/helpWord'
-    },
-])
+import { QuickreplyFilled } from '@vicons/material'
+import { FileImport } from '@vicons/fa'
+import { PeopleRound } from '@vicons/material'
+import { Help } from '@vicons/ionicons5'
+import { Icon } from '@vicons/utils' 
 </script>
 
 <template>
     <LeftSM class="bg-gray-500 w-15 p-4">
-        <ul>
-            <li v-for="(item, index) in items" :key="index" class="flex items-center mb-2">
-                <router-link :to="item.link" class="flex items-center w-full">
-                    <img :src="'./assets/pics/icons/' + item.image + '.svg'" :alt="item.name" class="w-7.5 h-7.5 mr-2">
-                </router-link>
-            </li>
+        <ul class="flex flex-col gap-4 justify-center items-center">
+            <li><router-link to="/quickCreate"><Icon size="36" color="#87CEFA"><QuickreplyFilled></QuickreplyFilled></Icon></router-link></li>
+            <li><router-link to="/sourceGoDown"><Icon size="36" color="#87CEFA"><FileImport></FileImport></Icon></router-link></li>
+            <li><router-link to="/chatWithPeople"><Icon size="36" color="#87CEFA"><PeopleRound></PeopleRound></Icon></router-link></li>
+            <li><router-link to="/helpWord"><Icon size="36" color="#87CEFA"><Help></Help></Icon></router-link></li>
         </ul>
     </LeftSM>
 </template>

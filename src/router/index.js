@@ -18,6 +18,7 @@ import PersonalInfo from '../components/MainPages/PersonalPage/PersonalInfoPage.
 import PersonalStatistic from '../components/MainPages/PersonalPage/PersonalStatisticPage.vue';
 import { useAuthStore } from '../stores/authStore';
 import { useAssistantStore } from '../stores/assistantStore';
+import { storeToRefs } from 'pinia';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -46,19 +47,23 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   const assistantStore = useAssistantStore()
+  const { assistants } = storeToRefs(assistantStore)
   
-  if(to.path === '/' || to.path === '/login'){
+  if(to.path === '/' || to.path === '/login' || to.path === '/login/SA' || to.path === '/register' || to.path === '/register/SA'){
     authStore.logout()
+  }
+
+  if(to.path === '/'){
+    assistantStore.setCurrentAssistant(assistants.value[0])
   }
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/login')
-  } else if (authStore.isAuthenticated && to.meta.requiresAuth) {
-    // if (assistantStore.assistants.length === 0) {
-    //   await assistantStore.fetchAssistants()
-    // }
+  } 
+  else if (authStore.isAuthenticated && to.meta.requiresAuth) {
     next()
-  } else {
+  } 
+  else {
     next()
   }
 })
