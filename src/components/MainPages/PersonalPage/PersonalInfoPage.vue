@@ -5,6 +5,7 @@
       <div class="flex flex-1">
         <LeftSmallList />
         <PersonalLeftList />
+        <div id="sakana-widget" class="fixed bottom-4 right-4 z-50"></div>
         <div class="flex-1 p-8">
           <n-card title="个人信息" class="max-w-2xl mx-auto">
             <div class="grid grid-cols-2 gap-6">
@@ -119,7 +120,7 @@
 <script>
 import Header from '../../PublicComponents/Header.vue';
 import LeftSmallList from '../../PublicComponents/LeftSmallList.vue';
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, onMounted} from 'vue';
 import { useAuthStore } from '../../../stores/authStore';
 import PersonalLeftList from './PersonalLeftList.vue';
 import { NConfigProvider } from 'naive-ui';
@@ -133,6 +134,9 @@ import {
   NFormItem
 } from 'naive-ui';
 import router from '../../../router';
+
+import 'sakana-widget/lib/index.css';
+import SakanaWidget from 'sakana-widget';
 
 export default defineComponent({
   components: {
@@ -149,6 +153,10 @@ export default defineComponent({
     NConfigProvider
   },
   setup() {
+    onMounted(() => {
+      new SakanaWidget().mount('#sakana-widget');
+    });
+
     const authStore = useAuthStore();
 
     const userInfo = ref({

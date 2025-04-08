@@ -1,6 +1,9 @@
 <template>
   <header class="header bg-blue-600 text-white p-4 flex justify-between items-center">
-    <Icon size="24"><Money16Regular /></Icon>
+    <div class="flex items-center">
+      <Icon size="24"><Money16Regular /></Icon>
+      <h1 class="text-xl font-bold ml-5">Chat Island</h1>
+    </div>
     <nav class="flex-shrink-0">
       <ul class="flex gap-8">
         <li><router-link to="/" class="hover:underline">首页</router-link></li>

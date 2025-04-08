@@ -10,7 +10,7 @@ const { currentAssistant } = storeToRefs(assistantStore)
 <template>
   <aside class="w-80 bg-gray-300 flex flex-col">
     <div class="bg-blue-200 h-15 flex items-center justify-center">
-      <h2 class="text-xl font-bold">对话记录</h2>
+      <h2 class="text-xl font-bold list-title">对话记录</h2>
     </div>
     <div v-if="currentAssistant" class="flex-1 overflow-y-auto">
       <div 
