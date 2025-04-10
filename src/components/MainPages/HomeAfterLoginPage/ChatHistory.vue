@@ -1,5 +1,4 @@
 <script setup>
-import { ref, watch } from "vue";
 import { storeToRefs } from 'pinia'
 import { useAssistantStore } from '../../../stores/assistantStore'
 
@@ -27,12 +26,7 @@ const { currentAssistant } = storeToRefs(assistantStore)
   </aside>
 </template>
     
-  <script>
-  export default {
-    name: "ChatHistory",
-  };
-  </script>
-  
+
 <style scoped>
 .list-title {
   font-size: 1.5rem;

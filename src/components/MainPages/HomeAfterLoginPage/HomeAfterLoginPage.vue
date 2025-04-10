@@ -3,23 +3,31 @@
     <Header />
     <div class="flex flex-1">
       <LeftSmallList />
-      <AssistantList/>
-      <ChatMainContent/>
-      <ChatHistory/>
+        <AssistantList/>
+        <ChatMainContent/>      
+        <ChatHistory/>
     </div>
   </div>
 </template>
 
 <script>
-import Header from '../../PublicComponents/Header.vue';
-import LeftSmallList from '../../PublicComponents/LeftSmallList.vue';
-import AssistantList from './AssistantList.vue';
-import ChatMainContent from './ChatMainContent.vue';
-import ChatHistory from './ChatHistory.vue';
+import Header from '../../PublicComponents/Header.vue'
+import LeftSmallList from '../../PublicComponents/LeftSmallList.vue'  
+import AssistantList from './AssistantList.vue'
+import ChatMainContent from './ChatMainContent.vue'
+import ChatHistory from './ChatHistory.vue'
 
 export default {
-  components: { Header, LeftSmallList, AssistantList, ChatMainContent, ChatHistory },
-};
+  components: { 
+    Header,
+    LeftSmallList,
+    AssistantList,
+    ChatMainContent,
+    ChatHistory
+  }
+}
 </script>
 
-<style scoped></style>
+<style scoped>
+
+</style>

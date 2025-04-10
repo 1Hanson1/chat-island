@@ -1,11 +1,12 @@
 <script setup>
+import { NCard, NList, NListItem, NThing } from 'naive-ui'
 import { useAssistantStore } from '../../../stores/assistantStore'
 import { storeToRefs } from 'pinia'
 
 const assistantStore = useAssistantStore()
 const { assistants, currentAssistant } = storeToRefs(assistantStore)
 
-function selectAssistant(assistant){
+function selectAssistant(assistant) {
   assistantStore.setCurrentAssistant(assistant)
 }
 </script>
@@ -39,7 +40,7 @@ function selectAssistant(assistant){
     </button>
   </aside>
 </template>
-  
+
 <style scoped>
 .list-title {
   font-size: 1.5rem;
