@@ -7,10 +7,11 @@ const { currentAssistant } = storeToRefs(assistantStore)
 </script>
 
 <template>
-  <aside class="w-80 bg-gray-300 flex flex-col">
-    <div class="bg-blue-200 h-15 flex items-center justify-center">
+  <aside class="flex flex-col">
+    <div class="h-15 flex items-center justify-center">
       <h2 class="text-xl font-bold list-title">对话记录</h2>
     </div>
+    <hr>
     <div v-if="currentAssistant" class="flex-1 overflow-y-auto">
       <div 
         v-for="item in currentAssistant.history" 
@@ -29,10 +30,10 @@ const { currentAssistant } = storeToRefs(assistantStore)
 
 <style scoped>
 .list-title {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
 }
 .list-content {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 </style>
     

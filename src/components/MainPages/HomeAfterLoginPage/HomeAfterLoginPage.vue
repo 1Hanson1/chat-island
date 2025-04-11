@@ -3,9 +3,11 @@
     <Header />
     <div class="flex flex-1">
       <LeftSmallList />
-        <AssistantList/>
-        <ChatMainContent/>      
-        <ChatHistory/>
+      <div class="flex flex-1">
+        <AssistantList class="w-80" />
+        <ChatMainContent class="flex-1" />
+        <ChatHistory class="w-80" />
+      </div>
     </div>
   </div>
 </template>

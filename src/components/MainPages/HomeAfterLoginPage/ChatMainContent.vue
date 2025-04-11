@@ -44,10 +44,11 @@ function sendMessage() {
 </script>
 
 <template>
-  <main class="flex-1 flex flex-col h-full">
-    <h1 class="bg-blue-300 text-gray-800 p-4 text-xl font-bold">
+  <main class="bg-gray-50 flex-1 flex flex-col h-full">
+    <h1 class=" text-gray-800 p-4 text-xl font-bold">
       {{ currentAssistant?.name || 'AI 对话助手' }}
     </h1>
+    <hr>
     <div v-if="currentAssistant" class="chat-content flex-1 overflow-y-auto mb-4 space-y-4 p-4">
       <div 
         v-for="(message, index) in messages" 

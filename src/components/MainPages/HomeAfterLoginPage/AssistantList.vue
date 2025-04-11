@@ -12,10 +12,11 @@ function selectAssistant(assistant) {
 </script>
 
 <template>
-  <aside class="w-80 bg-gray-300 flex flex-col">
-    <div class="bg-blue-200  h-15 flex items-center justify-center">
+  <aside class="flex flex-col">
+    <div class="h-15 flex items-center justify-center">
       <h2 class="list-title font-bold">助手列表</h2>
     </div>
+    <hr>
     <div class="flex-1 overflow-y-auto">
       <div 
         v-for="assistant in assistants" 
@@ -43,10 +44,10 @@ function selectAssistant(assistant) {
 
 <style scoped>
 .list-title {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
 }
 .list-content {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 </style>
   
