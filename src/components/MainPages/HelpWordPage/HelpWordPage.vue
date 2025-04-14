@@ -1,45 +1,46 @@
 <template>
-  <div class="flex flex-col h-screen">
-    <Header />
-    <div class="flex flex-1">
-      <LeftSmallList />
-      <div class="help-container flex h-full w-full">
-        <!-- 左侧导航栏 -->
-        <n-card
-          class="w-64 p-0 overflow-y-auto"
-          content-style="padding:0"
-          :bordered="false"
-        >
-          <n-menu
-            :options="menuOptions"
-            :default-expanded-keys="defaultExpandedKeys"
-            @update:value="handleMenuSelect"
-          />
-        </n-card>
-
-        <!-- 右侧内容区 -->
-        <div class="flex-1 overflow-auto w-full">
+  <NConfigProvider :theme-overrides="themeOverrides">
+    <div class="flex flex-col h-screen">
+      <Header />
+      <div class="flex flex-1">
+        <LeftSmallList />
+        <div class="help-container flex h-full w-full">
+          <!-- 左侧导航栏 -->
           <n-card
-            v-if="markdownContent"
-            class="h-full w-full"
-            content-style="padding:2rem;height:100%;width:100%;display:flex;flex-direction:column"
+            class="w-64 p-0 overflow-y-auto"
+            content-style="padding:0"
+            :bordered="false"
           >
-            <template #header>
-              <n-h1>{{ currentTitle }}</n-h1>
-            </template>
-            <n-spin v-if="loading" size="large" />
-            <div v-else class="markdown-body " v-html="compiledMarkdown"></div>
+            <n-menu
+              :options="menuOptions"
+              :default-expanded-keys="defaultExpandedKeys"
+              @update:value="handleMenuSelect"
+            />
           </n-card>
-          <n-empty
-            v-else
-            class="h-full flex items-center justify-center"
-            description="请从左侧选择要查看的帮助内容"
-          />
+
+          <!-- 右侧内容区 -->
+          <div class="flex-1 overflow-auto w-full">
+            <n-card
+              v-if="markdownContent"
+              class="h-full w-full"
+              content-style="padding:2rem;height:100%;width:100%;display:flex;flex-direction:column"
+            >
+              <template #header>
+                <n-h1>{{ currentTitle }}</n-h1>
+              </template>
+              <n-spin v-if="loading" size="large" />
+              <div v-else class="markdown-body " v-html="compiledMarkdown"></div>
+            </n-card>
+            <n-empty
+              v-else
+              class="h-full flex items-center justify-center"
+              description="请从左侧选择要查看的帮助内容"
+            />
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  
+  </NConfigProvider>
 </template>
 
 <script >
@@ -68,7 +69,26 @@ export default {
     NConfigProvider
   },
   setup() {
-    
+    const themeOverrides = {
+      common: {
+        primaryColor: '#2080f0',
+        primaryColorHover: '#4098fc',
+        primaryColorPressed: '#1060c9',
+        primaryColorSuppl: '#4098fc'
+      },
+      Button: {
+        textColor: '#2080f0'
+      },
+      Menu: {
+        itemTextColorActive: '#2080f0',
+        itemTextColorHover: '#2080f0',
+        itemTextColorChildActive: '#2080f0',
+        itemIconColorActive: '#2080f0',
+        itemIconColorHover: '#2080f0',
+        itemIconColorChildActive: '#2080f0'
+      }
+    }
+
     const sections = ref([
       {
         title: '主要问题',
@@ -94,7 +114,6 @@ export default {
       }
     ])
 
-    // 转换为NMenu需要的格式
     const menuOptions = computed(() => {
       return sections.value.map((section, index) => ({
         label: section.title,
@@ -141,6 +160,7 @@ export default {
     })
 
     return {
+      themeOverrides,
       menuOptions,
       defaultExpandedKeys,
       markdownContent,

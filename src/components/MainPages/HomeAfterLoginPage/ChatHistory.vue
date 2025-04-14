@@ -4,6 +4,12 @@ import { useAssistantStore } from '../../../stores/assistantStore'
 
 const assistantStore = useAssistantStore()
 const { currentAssistant } = storeToRefs(assistantStore)
+
+function selectHistory(history) {
+  console.log('Selecting history:', history.id)
+  assistantStore.setCurrentHistory(history.id)
+  console.log('Current history ID:', assistantStore.currentHistoryID)
+}
 </script>
 
 <template>
@@ -14,11 +20,13 @@ const { currentAssistant } = storeToRefs(assistantStore)
     <hr>
     <div v-if="currentAssistant" class="flex-1 overflow-y-auto">
       <div 
-        v-for="item in currentAssistant.history" 
-        :key="item.id" 
-        class="p-4 hover:bg-gray-200 list-content"
-      >
-        {{ item.title }}
+      v-for="history in currentAssistant.historys"
+      :key="history.id"
+      class="p-4 hover:bg-gray-200 cursor-pointer"
+      @click="selectHistory(history)"
+      :class="{ 'bg-gray-200': history.id === assistantStore.currentHistoryID }"
+    >
+        <span class="list-content">{{ history.title }}</span>
       </div>
     </div>
     <div v-else class="flex items-center justify-center h-full">

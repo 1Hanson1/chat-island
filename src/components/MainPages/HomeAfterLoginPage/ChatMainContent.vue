@@ -7,9 +7,9 @@ const assistantStore = useAssistantStore()
 const { currentAssistant } = storeToRefs(assistantStore)
 
 const messages = ref([
-  { text: `你好！我是${currentAssistant.value?.name || 'AI助手'}，有什么可以帮您的吗？`, sender: 'ai' }
+
 ])
-const newMessage = ref('')
+const newMessage = ref('') //输入框内容
 
 watch(currentAssistant, (newVal) => {
   if (newVal) {
@@ -20,17 +20,21 @@ watch(currentAssistant, (newVal) => {
 //重置
 function resetMessagesForAssistant(assistant) {
   messages.value = [
-    { text: `你好！我是${assistant.name}，有什么可以帮您的吗？`, sender: 'ai' }
+
   ]
 }
 
 function sendMessage() {
   if (!newMessage.value.trim()) return;
-  
+
+  // 添加消息到历史记录
+  assistantStore.addHistory(currentAssistant.value.id, 'user', newMessage.value)
   messages.value.push({
     text: newMessage.value,
     sender: 'user'
   });
+
+
   
   newMessage.value = '';
   
@@ -39,6 +43,7 @@ function sendMessage() {
       text: '收到你的消息: ' + messages.value[messages.value.length - 1].text,
       sender: 'ai'
     });
+    assistantStore.addHistory(currentAssistant.value.id, 'ai', messages.value[messages.value.length - 1].text)
   }, 500);
 }
 </script>

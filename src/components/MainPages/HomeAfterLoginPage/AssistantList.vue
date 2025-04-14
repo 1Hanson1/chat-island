@@ -7,6 +7,7 @@ const assistantStore = useAssistantStore()
 const { assistants, currentAssistant } = storeToRefs(assistantStore)
 
 function selectAssistant(assistant) {
+
   assistantStore.setCurrentAssistant(assistant)
 }
 </script>
@@ -23,7 +24,7 @@ function selectAssistant(assistant) {
         :key="assistant.id"
         class="p-4 hover:bg-gray-200 cursor-pointer flex justify-between items-center"
         @click="selectAssistant(assistant)"
-        :class="{ 'bg-gray-200': assistant.id === currentAssistant?.id }"
+        :class="{ 'bg-gray-200': assistant.id === currentAssistant.id }"
       >
         <span class="list-content">{{ assistant.name }}</span>
         <div class="opacity-0 hover:opacity-100 transition-opacity duration-200">
