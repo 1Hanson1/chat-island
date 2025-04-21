@@ -6,9 +6,18 @@ const assistantStore = useAssistantStore()
 const { currentAssistant } = storeToRefs(assistantStore)
 
 function selectHistory(history) {
-  console.log('Selecting history:', history.id)
   assistantStore.setCurrentHistory(history.id)
-  console.log('Current history ID:', assistantStore.currentHistoryID)
+}
+
+function deleteHistory(historyId) {
+  const index = currentAssistant.value.historys.findIndex(h => h.id === historyId)
+    if (index !== -1) {
+      currentAssistant.value.historys.splice(index, 1)
+      // 如果删除的是当前选中的历史记录，重置选中状态
+      if (assistantStore.currentHistoryID === historyId) {
+        assistantStore.setCurrentHistory(null)
+      }
+    }
 }
 </script>
 
@@ -20,13 +29,21 @@ function selectHistory(history) {
     <hr>
     <div v-if="currentAssistant" class="flex-1 overflow-y-auto">
       <div 
-      v-for="history in currentAssistant.historys"
-      :key="history.id"
-      class="p-4 hover:bg-gray-200 cursor-pointer"
-      @click="selectHistory(history)"
-      :class="{ 'bg-gray-200': history.id === assistantStore.currentHistoryID }"
-    >
-        <span class="list-content">{{ history.title }}</span>
+        v-for="history in currentAssistant.historys"
+        :key="history.id"
+        class="p-4 hover:bg-gray-200 cursor-pointer"
+        @click="selectHistory(history)"
+        :class="{ 'bg-gray-200': history.id === assistantStore.currentHistoryID }"
+      >
+        <div class="flex items-center justify-between">
+          <span class="list-content">{{ history.title }}</span>
+          <button 
+            class="text-red-500 hover:text-red-700 opacity-0 hover:opacity-100 transition-opacity duration-200"
+            @click.stop="deleteHistory(history.id)"
+          >
+            删除
+          </button>
+        </div>
       </div>
     </div>
     <div v-else class="flex items-center justify-center h-full">

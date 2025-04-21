@@ -39,9 +39,26 @@ export const useAssistantStore = defineStore('assistant', () => {
     currentHistoryID.value = historyId
   }
 
+  // 创建历史记录
+  function createHistory(assistantId){
+    const assistant = assistants.value.find(a => a.id === assistantId)
+    if (assistant) {
+      const newHistory = {
+        id: Date.now(), // 使用时间戳作为唯一ID
+        title: '新会话',
+        message: []
+      }
+      assistant.historys.unshift(newHistory)
+      setCurrentHistory(newHistory.id) // 设置新创建的history为当前选中
+    }
+    return null
+  }
+
+  // 添加历史记录
   function addHistory(assistantId, talker, content) {
     const assistant = assistants.value.find(a => a.id === assistantId)
     if (assistant) {
+      // 仅处理助手的第一个历史记录
       if (assistant.historys.length === 0) {
         const newHistory = {
           id: Date.now(), // 使用时间戳作为唯一ID
@@ -50,25 +67,22 @@ export const useAssistantStore = defineStore('assistant', () => {
         }
         assistant.historys.push(newHistory)
         setCurrentHistory(newHistory.id) // 设置新创建的history为当前选中
-      } else {
+      } 
+      else {
         // 找到当前选中的history记录
         const currentHistory = assistant.historys.find(h => h.id === currentHistoryID.value)
+        if (currentHistory.message.length === 0){
+          currentHistory.title = content.slice(0, 20) + (content.length > 20 ? '...' : '')
+        }
         if (currentHistory) {
           currentHistory.message.push({
             id: currentHistory.message.length + 1,
             talker,
             content
           })
-        } else {
-          // 如果没有选中的history，默认添加到最后一个
-          const lastHistory = assistant.historys[assistant.historys.length - 1]
-          lastHistory.message.push({
-            id: lastHistory.message.length + 1,
-            talker,
-            content
-          })
+        } 
+        else {
         }
-
       }
     }
   }
@@ -79,6 +93,7 @@ export const useAssistantStore = defineStore('assistant', () => {
     currentHistoryID,
     setCurrentHistory,
     setCurrentAssistant,
+    createHistory,
     addHistory,
   }
 })

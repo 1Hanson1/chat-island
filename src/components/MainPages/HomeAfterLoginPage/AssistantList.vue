@@ -7,8 +7,8 @@ const assistantStore = useAssistantStore()
 const { assistants, currentAssistant } = storeToRefs(assistantStore)
 
 function selectAssistant(assistant) {
-
   assistantStore.setCurrentAssistant(assistant)
+  assistantStore.createHistory(assistant.id)
 }
 </script>
 

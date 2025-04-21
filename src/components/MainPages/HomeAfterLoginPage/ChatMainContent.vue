@@ -1,75 +1,89 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { storeToRefs } from 'pinia'
 import { useAssistantStore } from '../../../stores/assistantStore'
+import { Add } from '@vicons/ionicons5'
+import { Icon } from '@vicons/utils'
+
 
 const assistantStore = useAssistantStore()
-const { currentAssistant } = storeToRefs(assistantStore)
+const { currentAssistant, currentHistoryID} = storeToRefs(assistantStore)
 
-const messages = ref([
-
-])
-const newMessage = ref('') //输入框内容
-
-watch(currentAssistant, (newVal) => {
-  if (newVal) {
-    resetMessagesForAssistant(newVal)
-  }
+const messages = computed(() => {
+  const currentAssistant = assistantStore.currentAssistant
+  const currentHistory = currentAssistant?.historys.find(
+    h => h.id === assistantStore.currentHistoryID
+  )
+  return currentHistory?.message || []
 })
 
-//重置
-function resetMessagesForAssistant(assistant) {
-  messages.value = [
+const newMessage = ref('') //输入框内容
 
-  ]
-}
 
 function sendMessage() {
   if (!newMessage.value.trim()) return;
 
-  // 添加消息到历史记录
-  assistantStore.addHistory(currentAssistant.value.id, 'user', newMessage.value)
-  messages.value.push({
-    text: newMessage.value,
-    sender: 'user'
-  });
+  assistantStore.addHistory(
+    currentAssistant.value.id,
+    'user',
+    newMessage.value
+  );
 
-
-  
+  let mid = newMessage.value;
   newMessage.value = '';
   
   setTimeout(() => {
-    messages.value.push({
-      text: '收到你的消息: ' + messages.value[messages.value.length - 1].text,
-      sender: 'ai'
-    });
-    assistantStore.addHistory(currentAssistant.value.id, 'ai', messages.value[messages.value.length - 1].text)
+    const aiResponse = '收到你的消息: ' + mid;
+    assistantStore.addHistory(
+      currentAssistant.value.id,
+      'ai',
+      aiResponse
+    );
   }, 500);
+  
 }
+
+function createNewChat() {
+  assistantStore.createHistory(currentAssistant.value.id)
+  console.log(currentAssistant.value.historys[0])
+}
+
 </script>
 
 <template>
   <main class="bg-gray-50 flex-1 flex flex-col h-full">
-    <h1 class=" text-gray-800 p-4 text-xl font-bold">
+    <div class="flex items-center justify-between">
+      <h1 class=" text-gray-800 m-4 text-xl font-bold">
       {{ currentAssistant?.name || 'AI 对话助手' }}
-    </h1>
+      </h1>
+      <button 
+        v-if="currentAssistant"
+        @click="createNewChat"
+        class="bg-blue-500 text-white p-2 m-2 flex items-center rounded-lg hover:bg-blue-600"
+      >
+        <Icon>
+          <Add />
+        </Icon>
+      </button>
+    </div>
+    
     <hr>
     <div v-if="currentAssistant" class="chat-content flex-1 overflow-y-auto mb-4 space-y-4 p-4">
       <div 
         v-for="(message, index) in messages" 
         :key="index"
         :class="{
-          'flex justify-end': message.sender === 'user',
-          'flex justify-start': message.sender === 'ai'
+          'flex justify-end': message.talker === 'user',
+          'flex justify-start': message.talker === 'ai'
         }"
       >
         <div 
           :class="{
-            'bg-blue-500 text-white rounded-l-lg rounded-br-lg px-4 py-2 max-w-xs': message.sender === 'user',
-            'bg-gray-200 rounded-r-lg rounded-bl-lg px-4 py-2 max-w-xs': message.sender === 'ai'
+            'bg-blue-500 text-white rounded-l-lg rounded-br-lg px-4 py-2 max-w-xs': message.talker === 'user',
+            'bg-gray-200 rounded-r-lg rounded-bl-lg px-4 py-2 max-w-xs': message.talker === 'ai'
           }"
         >
-          {{ message.text }}
+          {{ message.content }}
         </div>
       </div>
     </div>
