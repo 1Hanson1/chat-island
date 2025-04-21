@@ -10,6 +10,7 @@ function selectAssistant(assistant) {
   assistantStore.setCurrentAssistant(assistant)
   assistantStore.createHistory(assistant.id)
 }
+
 </script>
 
 <template>
@@ -22,11 +23,11 @@ function selectAssistant(assistant) {
       <div 
         v-for="assistant in assistants" 
         :key="assistant.id"
-        class="p-4 hover:bg-gray-200 cursor-pointer flex justify-between items-center"
         @click="selectAssistant(assistant)"
+        class="p-4 hover:bg-gray-200 cursor-pointer flex justify-between items-center"
         :class="{ 'bg-gray-200': assistant.id === currentAssistant.id }"
       >
-        <span class="list-content">{{ assistant.name }}</span>
+        <div class="list-content">{{ assistant.name }}</div>
         <div class="opacity-0 hover:opacity-100 transition-opacity duration-200">
           <button class="ml-2 text-gray-500 hover:text-gray-700">
             设置
