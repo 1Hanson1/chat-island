@@ -16,7 +16,18 @@ function deleteHistory(historyId) {
       currentAssistant.value.historys.splice(index, 1)
       // 如果删除的是当前选中的历史记录，重置选中状态
       if (assistantStore.currentHistoryID === historyId) {
-        assistantStore.setCurrentHistory(null)
+        if(currentAssistant.value.historys.length === 0){
+          assistantStore.createHistory(currentAssistant.value.id)
+        }
+        else{
+          if(currentAssistant.value.historys[0].message.length === 0){
+            assistantStore.setCurrentHistory(currentAssistant.value.historys[1].id)
+          }
+          else{
+            assistantStore.createHistory(currentAssistant.value.id)
+          }
+        }
+        
       }
     }
 }
