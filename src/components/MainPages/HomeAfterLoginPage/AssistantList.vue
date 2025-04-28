@@ -1,5 +1,5 @@
 <script setup>
-import { NCard, NList, NListItem, NThing } from 'naive-ui'
+import { NScrollbar} from 'naive-ui'
 import { useAssistantStore } from '../../../stores/assistantStore'
 import { storeToRefs } from 'pinia'
 
@@ -8,7 +8,15 @@ const { assistants, currentAssistant } = storeToRefs(assistantStore)
 
 function selectAssistant(assistant) {
   assistantStore.setCurrentAssistant(assistant)
-  assistantStore.createHistory(assistant.id)
+  const currentHistory = assistant.historys[0]
+  if (currentHistory) {
+    if(currentHistory.message.length > 0) {
+      assistantStore.createHistory(assistant.id)
+    }
+    else {
+      assistantStore.setCurrentHistory(currentHistory.id)
+    }
+  }
 }
 
 </script>
@@ -20,23 +28,17 @@ function selectAssistant(assistant) {
     </div>
     <hr>
     <div class="flex-1 overflow-y-auto">
-      <div 
-        v-for="assistant in assistants" 
-        :key="assistant.id"
-        @click="selectAssistant(assistant)"
-        class="p-4 hover:bg-gray-200 cursor-pointer flex justify-between items-center"
-        :class="{ 'bg-gray-200': assistant.id === currentAssistant.id }"
-      >
-        <div class="list-content">{{ assistant.name }}</div>
-        <div class="opacity-0 hover:opacity-100 transition-opacity duration-200">
-          <button class="ml-2 text-gray-500 hover:text-gray-700">
-            设置
-          </button>
-          <button class="ml-2 text-red-500 hover:text-red-700">
-            删除
-          </button>
+      <n-scrollbar style="max-height: 740px" trigger="hover">
+        <div 
+          v-for="assistant in assistants" 
+          :key="assistant.id"
+          @click="selectAssistant(assistant)"
+          class="p-4 hover:bg-gray-200 cursor-pointer flex justify-between items-center"
+          :class="{ 'bg-gray-200': assistant.id === currentAssistant.id }"
+        >
+          <div class="list-content">{{ assistant.name }}</div>
         </div>
-      </div>
+      </n-scrollbar>
     </div>
     <button class="m-4 p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
       添加助手

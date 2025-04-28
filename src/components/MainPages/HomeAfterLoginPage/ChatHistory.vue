@@ -1,5 +1,6 @@
 <script setup>
 import { storeToRefs } from 'pinia'
+import { NScrollbar } from 'naive-ui'
 import { useAssistantStore } from '../../../stores/assistantStore'
 
 const assistantStore = useAssistantStore()
@@ -27,28 +28,31 @@ function deleteHistory(historyId) {
       <h2 class="text-xl font-bold list-title">对话记录</h2>
     </div>
     <hr>
-    <div v-if="currentAssistant" class="flex-1 overflow-y-auto">
-      <div 
-        v-for="history in currentAssistant.historys"
-        :key="history.id"
-        class="p-4 hover:bg-gray-200 cursor-pointer"
-        @click="selectHistory(history)"
-        :class="{ 'bg-gray-200': history.id === assistantStore.currentHistoryID }"
-      >
-        <div class="flex items-center justify-between">
-          <span class="list-content">{{ history.title }}</span>
-          <button 
-            class="text-red-500 hover:text-red-700 opacity-0 hover:opacity-100 transition-opacity duration-200"
-            @click.stop="deleteHistory(history.id)"
-          >
-            删除
-          </button>
+    <n-scrollbar style="max-height: 740px" trigger="hover">
+      <div v-if="currentAssistant" class="flex-1 overflow-y-auto">
+        <div 
+          v-for="history in currentAssistant.historys"
+          :key="history.id"
+          class="p-4 hover:bg-gray-200 cursor-pointer"
+          @click="selectHistory(history)"
+          :class="{ 'bg-gray-200': history.id === assistantStore.currentHistoryID }"
+        >
+          <div class="flex items-center justify-between">
+            <span class="list-content">{{ history.title }}</span>
+            <button 
+              class="text-red-500 hover:text-red-700 opacity-0 hover:opacity-100 transition-opacity duration-200"
+              @click.stop="deleteHistory(history.id)"
+            >
+              删除
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-    <div v-else class="flex items-center justify-center h-full">
-      <p>请从左侧选择助手</p>
-    </div>
+      <div v-else class="flex items-center justify-center h-full">
+        <p>请从左侧选择助手</p>
+      </div>
+    </n-scrollbar>
+    
   </aside>
 </template>
     

@@ -4,6 +4,12 @@ import { ref } from 'vue'
 export const useAssistantStore = defineStore('assistant', () => {
   const assistants = ref([
     {
+      id: 0,
+      name: '随便聊聊',
+      historys: [
+      ],
+    },
+    {
       id: 1,
       name: '写作助手',
       historys: [

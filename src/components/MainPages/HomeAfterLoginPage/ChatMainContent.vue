@@ -3,6 +3,8 @@ import { ref, watch, computed } from 'vue';
 import { storeToRefs } from 'pinia'
 import { useAssistantStore } from '../../../stores/assistantStore'
 import { Add } from '@vicons/ionicons5'
+import { IosSettings } from '@vicons/ionicons4'
+import { DeleteRound } from '@vicons/material'
 import { Icon } from '@vicons/utils'
 
 
@@ -18,7 +20,6 @@ const messages = computed(() => {
 })
 
 const newMessage = ref('') //输入框内容
-
 
 function sendMessage() {
   if (!newMessage.value.trim()) return;
@@ -44,8 +45,23 @@ function sendMessage() {
 }
 
 function createNewChat() {
-  assistantStore.createHistory(currentAssistant.value.id)
-  console.log(currentAssistant.value.historys[0])
+  const currentHistory = currentAssistant.value.historys[0]
+  if (currentHistory) {
+    if(currentHistory.message.length > 0) {
+      assistantStore.createHistory(currentAssistant.value.id)
+    }
+    else{
+      assistantStore.setCurrentHistory(currentAssistant.value.historys[0].id)
+    }
+  }
+}
+
+function setAssistant() {
+
+}
+
+function deleteAssistant() {
+
 }
 
 </script>
@@ -56,20 +72,45 @@ function createNewChat() {
       <h1 class=" text-gray-800 m-4 text-xl font-bold">
       {{ currentAssistant?.name || 'AI 对话助手' }}
       </h1>
-      <button 
-        v-if="currentAssistant"
-        @click="createNewChat"
-        class="bg-blue-500 text-white p-2 m-2 flex items-center rounded-lg hover:bg-blue-600"
-      >
-        <Icon>
-          <Add />
-        </Icon>
-      </button>
+      <div class="flex">
+        <button 
+          v-if="currentAssistant"
+          @click="createNewChat"
+          class="flex items-center justify-center bg-blue-500 text-white p-2 m-2 rounded-lg hover:bg-green-600"
+        >
+          <Icon size="20">
+            <Add />
+          </Icon>
+        </button>
+        <button 
+          v-if="currentAssistant"
+          @click="setAssistant"
+          class="flex items-center justify-center bg-blue-500 text-white p-2 m-2 rounded-lg hover:bg-gray-600"
+        >
+          <Icon size="20">
+            <IosSettings />
+          </Icon>
+        </button>
+        <button 
+          v-if="currentAssistant"
+          @click="deleteAssistant"
+          class="flex items-center justify-center bg-blue-500 text-white p-2 m-2 rounded-lg hover:bg-red-600"
+        >
+          <Icon size="20">
+            <DeleteRound />
+          </Icon>
+        </button>
+      </div>
     </div>
     
     <hr>
     <div v-if="currentAssistant" class="chat-content flex-1 overflow-y-auto mb-4 space-y-4 p-4">
+      <div v-if="messages.length === 0" class="flex flex-col items-center justify-center h-full">
+        <h2 class="text-2xl font-bold mb-4">欢迎使用{{ currentAssistant.name }}</h2>
+        <p class="text-gray-600">开始新的对话吧！(美化之后再说)</p>
+      </div>
       <div 
+        v-else
         v-for="(message, index) in messages" 
         :key="index"
         :class="{

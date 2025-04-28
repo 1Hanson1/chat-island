@@ -68,5 +68,4 @@ router.beforeEach(async (to, from, next) => {
   }
 })
 
-// 提供一个方法来设置登录状态
 export default router;
