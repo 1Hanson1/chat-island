@@ -4,19 +4,19 @@
     <div class="content-container">
       <LeftSmallList />
       <div class="main-content">
-        <NCard title="Knowledge Base" class="file-manager-card">
+        <NCard title="文件库" class="file-manager-card">
           <div class="file-manager-container">
             <div class="sidebar">
               <NTabs type="line">
-                <NTabPane name="categories" tab="Categories">
+                <NTabPane name="categories" tab="文件类型">
                   <NTree
-                    :data="fileCategories"
+                    :data="fileCategorsies"
                     :render-label="renderTreeLabel"
                     selectable
                     @update:selected-keys="handleCategorySelect"
                   />
                 </NTabPane>
-                <NTabPane name="groups" tab="Groups">
+                <NTabPane name="groups" tab="文件分组">
                   <NTree
                     :data="fileGroups"
                     :render-label="renderTreeLabel"
@@ -28,14 +28,14 @@
             </div>
             <div class="file-content">
               <NTabs type="line">
-                <NTabPane name="list" tab="List View">
+                <NTabPane name="list" tab="列表视图">
                   <NDataTable
                     :columns="fileColumns"
                     :data="filteredFiles"
                     :row-key="row => row.id"
                   />
                 </NTabPane>
-                <NTabPane name="grid" tab="Grid View">
+                <NTabPane name="grid" tab="网格视图">
                   <div class="file-grid">
                     <div v-for="file in filteredFiles" :key="file.id" class="file-item">
                       <NIcon :component="getFileIcon(file.type)" size="24" />
@@ -94,23 +94,23 @@ export default defineComponent({
   },
   setup() {
     const fileCategories = ref([
-      { key: 'cat1', label: 'Documents' },
-      { key: 'cat2', label: 'Images' },
-      { key: 'cat3', label: 'Videos' },
-      { key: 'cat4', label: 'Audio' }
+      { key: '文档', label: '文档' },
+      { key: '图片', label: '图片' },
+      { key: '视频', label: '视频' },
+      { key: '音频', label: '音频' }
     ]);
 
     const fileGroups = ref([
-      { key: 'group1', label: 'Project Files' },
-      { key: 'group2', label: 'Personal Files' },
-      { key: 'group3', label: 'Shared Files' }
+      { key: '分组1', label: '分组1' },
+      { key: '分组2', label: '分组2' },
+      { key: '分组3', label: '分组3' }
     ]);
 
     const files = ref([
-      { id: 1, name: 'document.pdf', type: 'document', category: 'cat1', group: 'group1' },
-      { id: 2, name: 'image.png', type: 'image', category: 'cat2', group: 'group2' },
-      { id: 3, name: 'video.mp4', type: 'video', category: 'cat3', group: 'group1' },
-      { id: 4, name: 'audio.mp3', type: 'audio', category: 'cat4', group: 'group3' }
+      { id: 1, name: 'document.pdf', type: '文档', category: '文档', group: '分组1' },
+      { id: 2, name: 'image.png', type: '图片', category: '图片', group: '分组2' },
+      { id: 3, name: 'video.mp4', type: '视频', category: '视频', group: '分组1' },
+      { id: 4, name: 'audio.mp3', type: '音频', category: '音频', group: '分组3' }
     ]);
 
     const selectedCategory = ref<string[]>([]);
@@ -150,9 +150,9 @@ export default defineComponent({
     };
 
     const fileColumns = [
-      { title: 'Name', key: 'name' },
-      { title: 'Type', key: 'type' },
-      { title: 'Actions', key: 'actions' }
+      { title: '文件名', key: 'name' },
+      { title: '文件类型', key: 'type' },
+      { title: '文件分组', key: 'group' },
     ];
 
     return {
