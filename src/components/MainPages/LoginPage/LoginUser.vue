@@ -3,9 +3,12 @@ import { ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import { NInput } from 'naive-ui';
 import { useAuthStore } from '../../../stores/authStore';
+import { login, getUserInfo } from '../../../api/user';
 
 const username = ref('');
 const password = ref('');
+const errorMessage = ref('');
+
 const router = useRouter();
 const authStore = useAuthStore();
 const role = ref('用户');
@@ -19,6 +22,29 @@ function handleLogin() {
         alert('用户名和密码都必须填写');
     }
 }
+
+// async function handleLogin() {
+//   try {
+//     // 登录请求
+//     const loginRes = await login({ name: username.value, password: password.value })
+
+//     const token = loginRes.data.token
+//     localStorage.setItem('token', token)
+
+//     // 获取用户信息
+//     const userInfoRes = await getUserInfo(username.value)
+
+//     localStorage.setItem('isAuthenticated', 'true');
+//     router.push('/home');
+//     console.log('用户信息：', userInfoRes.data.userInfo)
+//     errorMessage.value = ''
+
+//   } catch (err) {
+//     console.error(err)
+//     errorMessage.value = '登录失败，请检查用户名或密码'
+//   }
+// }
+
 </script>
 
 <template>

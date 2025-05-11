@@ -17,7 +17,7 @@ const options = [
 
 function handleLogin() {
     if (username.value && password.value) {
-        authStore.login(username.value, password.value, role.value);
+        authStore.loginSA(username.value, password.value, role.value);
         localStorage.setItem('isAuthenticated', 'true');
         router.push('/home');
     } else {
