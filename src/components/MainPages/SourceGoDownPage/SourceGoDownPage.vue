@@ -1,61 +1,82 @@
 <template>
-  <div class="knowledge-base-page">
-    <Header />
-    <div class="content-container">
-      <LeftSmallList />
-      <div class="main-content">
-        <NCard title="文件库" class="file-manager-card">
-          <div class="file-manager-container">
-            <div class="sidebar">
-              <NTabs type="line">
-                <NTabPane name="categories" tab="文件类型">
-                  <NTree
-                    :data="fileCategorsies"
-                    :render-label="renderTreeLabel"
-                    selectable
-                    @update:selected-keys="handleCategorySelect"
-                  />
-                </NTabPane>
-                <NTabPane name="groups" tab="文件分组">
-                  <NTree
-                    :data="fileGroups"
-                    :render-label="renderTreeLabel"
-                    selectable
-                    @update:selected-keys="handleGroupSelect"
-                  />
-                </NTabPane>
-              </NTabs>
+  <n-config-provider :theme-overrides="themeOverrides">
+    <div class="h-screen flex flex-col">
+      <Header />
+      <div class="flex-1 overflow-hidden flex">
+        <LeftSmallList />
+        <div class="flex-1 p-5 overflow-auto">
+          <NCard title="文件库" class="h-full">
+            <div class="h-full flex">
+              <div class="w-64 pr-5 border-r border-gray-300">
+                <NTabs type="line">
+                  <NTabPane name="categories" tab="文件类型">
+                    <NTree
+                      :data="fileCategories"
+                      :render-label="renderTreeLabel"
+                      selectable
+                      @update:selected-keys="handleCategorySelect"
+                    />
+                  </NTabPane>
+                  <NTabPane name="groups" tab="文件分组">
+                    <NTree
+                      :data="fileGroups"
+                      :render-label="renderTreeLabel"
+                      selectable
+                      @update:selected-keys="handleGroupSelect"
+                    />
+                  </NTabPane>
+                </NTabs>
+              </div>
+              <div class="flex-1 pl-5">
+                <div class="mb-4">
+                  <NButton type="primary" @click="showAddFileModal = true">添加文件</NButton>
+                </div>
+                <n-modal v-model:show="showAddFileModal">
+                  <NCard
+                    style="width: 600px"
+                    title="添加新文件"
+                    :bordered="false"
+                    size="huge"
+                    role="dialog"
+                    aria-modal="true"
+                  >
+                    <n-upload
+                      multiple
+                      directory-dnd
+                      :max="5"
+                    >
+                      <n-upload-dragger>
+                        <div style="margin-bottom: 12px">
+                          <n-icon size="48" :depth="3">
+                            <ArchiveIcon />
+                          </n-icon>
+                        </div>
+                        <n-text style="font-size: 16px">
+                          点击或者拖动文件到该区域来上传
+                        </n-text>
+                      </n-upload-dragger>
+                    </n-upload>
+                  </NCard>
+                </n-modal>
+                <n-data-Table
+                  :columns="fileColumns"
+                  :data="filteredFiles"
+                  :row-key="row => row.id"
+                />
+              </div>
             </div>
-            <div class="file-content">
-              <NTabs type="line">
-                <NTabPane name="list" tab="列表视图">
-                  <NDataTable
-                    :columns="fileColumns"
-                    :data="filteredFiles"
-                    :row-key="row => row.id"
-                  />
-                </NTabPane>
-                <NTabPane name="grid" tab="网格视图">
-                  <div class="file-grid">
-                    <div v-for="file in filteredFiles" :key="file.id" class="file-item">
-                      <NIcon :component="getFileIcon(file.type)" size="24" />
-                      <span>{{ file.name }}</span>
-                    </div>
-                  </div>
-                </NTabPane>
-              </NTabs>
-            </div>
-          </div>
-        </NCard>
+          </NCard>
+        </div>
       </div>
     </div>
-  </div>
+  </n-config-provider>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue';
 import Header from '../../PublicComponents/Header.vue';
 import LeftSmallList from '../../PublicComponents/LeftSmallList.vue';
+import { ArchiveOutline as ArchiveIcon } from '@vicons/ionicons5'
 import {
   NCard,
   NTree,
@@ -66,15 +87,13 @@ import {
   NForm,
   NFormItem,
   NInput,
-  NButton
+  NButton,
+  NModal,
+  NSelect,
+  NUpload,
+  NUploadDragger,
+  NConfigProvider
 } from 'naive-ui';
-import {
-  DocumentTextOutline,
-  FolderOutline,
-  ImageOutline,
-  VideocamOutline,
-  MusicalNotesOutline
-} from '@vicons/ionicons5';
 
 export default defineComponent({
   name: 'KnowledgeBasePage',
@@ -90,7 +109,13 @@ export default defineComponent({
     NForm,
     NFormItem,
     NInput,
-    NButton
+    NButton,
+    NModal,
+    NSelect,
+    NUpload,
+    NUploadDragger,
+    NConfigProvider,
+    ArchiveIcon
   },
   setup() {
     const fileCategories = ref([
@@ -107,10 +132,10 @@ export default defineComponent({
     ]);
 
     const files = ref([
-      { id: 1, name: 'document.pdf', type: '文档', category: '文档', group: '分组1' },
-      { id: 2, name: 'image.png', type: '图片', category: '图片', group: '分组2' },
-      { id: 3, name: 'video.mp4', type: '视频', category: '视频', group: '分组1' },
-      { id: 4, name: 'audio.mp3', type: '音频', category: '音频', group: '分组3' }
+      { name: 'document.pdf', type: '文档', category: '文档', group: '分组1' },
+      { name: 'image.png', type: '图片', category: '图片', group: '分组2' },
+      { name: 'video.mp4', type: '视频', category: '视频', group: '分组1' },
+      { name: 'audio.mp3', type: '音频', category: '音频', group: '分组3' }
     ]);
 
     const selectedCategory = ref<string[]>([]);
@@ -126,6 +151,13 @@ export default defineComponent({
       });
     });
 
+
+    const fileColumns = [
+      { title: '文件名', key: 'name' },
+      { title: '文件类型', key: 'type' },
+      { title: '文件分组', key: 'group' },
+    ];
+
     const handleCategorySelect = (keys: string[]) => {
       selectedCategory.value = keys;
     };
@@ -137,23 +169,16 @@ export default defineComponent({
     const renderTreeLabel = ({ option }: { option: any }) => {
       return option.label;
     };
+  
+    const showAddFileModal = ref(false);
 
-    const getFileIcon = (type: string) => {
-      switch (type) {
-        case 'document': return DocumentTextOutline;
-        case 'folder': return FolderOutline;
-        case 'image': return ImageOutline;
-        case 'video': return VideocamOutline;
-        case 'audio': return MusicalNotesOutline;
-        default: return DocumentTextOutline;
-      }
+    const themeOverrides = {
+      common: {
+        primaryColor: '#1a73e8', 
+        primaryColorHover: '#1a73e8',
+        primaryColorPressed: '#0D47A1',
+      },
     };
-
-    const fileColumns = [
-      { title: '文件名', key: 'name' },
-      { title: '文件类型', key: 'type' },
-      { title: '文件分组', key: 'group' },
-    ];
 
     return {
       fileCategories,
@@ -161,72 +186,17 @@ export default defineComponent({
       filteredFiles,
       selectedCategory,
       selectedGroup,
+      fileColumns,
       handleCategorySelect,
       handleGroupSelect,
       renderTreeLabel,
-      getFileIcon,
-      fileColumns
+      showAddFileModal,
+      themeOverrides
     };
   }
 });
 </script>
 
 <style scoped>
-.knowledge-base-page {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
 
-.content-container {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-}
-
-.main-content {
-  flex: 1;
-  padding: 20px;
-  overflow: auto;
-}
-
-.file-manager-card {
-  height: 100%;
-}
-
-.file-manager-container {
-  display: flex;
-  height: 100%;
-}
-
-.sidebar {
-  width: 250px;
-  padding-right: 20px;
-  border-right: 1px solid #eee;
-}
-
-.file-content {
-  flex: 1;
-  padding-left: 20px;
-}
-
-.file-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 16px;
-}
-
-.file-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 10px;
-  border: 1px solid #eee;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.file-item:hover {
-  background-color: #f5f5f5;
-}
 </style>

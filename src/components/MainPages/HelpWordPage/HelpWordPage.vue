@@ -54,6 +54,7 @@ import {
   NH1,
   NConfigProvider
 } from 'naive-ui'
+import 'github-markdown-css'
 import Header from '../../PublicComponents/Header.vue'
 import LeftSmallList from '../../PublicComponents/LeftSmallList.vue'
 
