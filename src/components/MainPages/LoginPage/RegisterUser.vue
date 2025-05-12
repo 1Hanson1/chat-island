@@ -2,30 +2,41 @@
 import { ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import { NInput } from 'naive-ui';
-import { useAuthStore } from '../../../stores/authStore';
+import { register } from '../../../api/user';
 
 const username = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const router = useRouter();
-const authStore = useAuthStore();
-const role = ref('用户');
+const category = ref('NORMAL');
 
-function handleRegister() {
-    if (!username.value || !password.value || !confirmPassword.value) {
-        alert('所有字段都必须填写');
-        return;
+async function handleRegister() {
+    try{
+        if (!username.value || !password.value || !confirmPassword.value) {
+            alert('所有字段都必须填写');
+            return;
+        }
+        
+        if (password.value !== confirmPassword.value) {
+            alert('两次输入的密码不一致');
+            return;
+        }
+        
+        const response = await register({
+            name: username.value,
+            password: password.value,
+            category: category.value,
+        });
+
+        console.log(response);
+
+        router.push('/login');
+    }
+    catch(error) {
+        console.log(error);
+        alert('注册失败，请检查网络或联系管理员');
     }
     
-    if (password.value !== confirmPassword.value) {
-        alert('两次输入的密码不一致');
-        return;
-    }
-    
-    // 这里调用注册API
-    authStore.register(username.value, password.value, role.value);
-    localStorage.setItem('isAuthenticated', 'true');
-    router.push('/home');
 }
 </script>
 

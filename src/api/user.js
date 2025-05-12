@@ -17,7 +17,11 @@ instance.interceptors.request.use(config => {
 
 // 注册
 export function register(data) {
-  return instance.post('/user/register', data);
+  return instance.post('/user/register', {
+      name: data.name,
+      password: data.password,
+      category: data.category,
+  });
 }
 
 // 登录
@@ -29,15 +33,10 @@ export function login(data) {
 }
 
 // 获取用户信息
-export function getUserInfo(name) {
+export function getUserInfo(data) {
   return instance.get(`${baseURL}/user/info`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        params: {
-          name: name.value
-        }
-      })
+    params: { name: data.name }
+  });
 }
 
 // 更新用户
@@ -46,18 +45,18 @@ export function updateUser(data) {
 }
 
 // 删除用户
-export function deleteUser(name) {
-  return instance.delete('/user/delete', { params: { name } });
+export function deleteUser(data) {
+  return instance.delete('/user/delete', { params: { name: data.name } });
 }
 
 // 升级 VIP
-export function upgradeVip(name, vipKey) {
-  return instance.post('/user-quota/upgrade-vip', { vipKey }, { params: { name } });
+export function upgradeVip(data) {
+  return instance.post('/user-quota/upgrade-vip', { vipKey: data.vipKey }, { params: { name: data.name } });
 }
 
 // VIP 续费
-export function renewVip(name, vipKey) {
-  return instance.post('/user-quota/renew-vip', { vipKey }, { params: { name } });
+export function renewVip(data) {
+  return instance.post('/user-quota/renew-vip', { vipKey: data.vipKey }, { params: { name: data.name } });
 }
 
 // 管理员移除 VIP
