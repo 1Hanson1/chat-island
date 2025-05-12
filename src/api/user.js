@@ -41,7 +41,13 @@ export function getUserInfo(data) {
 
 // 更新用户
 export function updateUser(data) {
-  return instance.put('/user/update', data);
+  return instance.put('/user/update', {
+    uid: data.uid,
+    name: data.name,
+    password: data.password,
+    newpassword: data.newPassword,
+    category: data.category,
+  });
 }
 
 // 删除用户
