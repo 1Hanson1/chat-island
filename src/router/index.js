@@ -39,7 +39,7 @@ const router = createRouter({
     { path: '/chatWithPeople', name: 'ChatWithPeople', component: ChatWithPeople, meta: { requiresAuth: true } },
     { path: '/helpWord', name: 'HelpWord', component: HelpWord, meta: { requiresAuth: true } },
     { path: '/personal/Info', name: 'PersonalInfo', component: PersonalInfo, meta: { requiresAuth: true } },
-    { path: '/personal/Statistic', name: 'PersonalStatistic', component: PersonalStatistic, meta: { requiresAuth: true } }
+    { path: '/personal/Statistic', name: 'PersonalStatistic', component: PersonalStatistic, meta: { requiresAuth: true } },
   ],
 });
 

@@ -156,7 +156,8 @@ export default {
     const themeOverrides = {
       common: {
         primaryColor: '#3b82f6',
-        primaryColorHover: '#3b72ff'
+        primaryColorHover: '#3b72ff',
+        primaryColorPressed: '#3b62e6'
       }
     };
 

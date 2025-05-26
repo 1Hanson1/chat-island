@@ -6,6 +6,27 @@
         <LeftSmallList />
         <div class="flex-1 p-8">
           <n-card title="AI 使用余量" class="max-w-4xl mx-auto">
+            <div v-if="hasDuration" class="mb-6 p-4 bg-blue-50 rounded-lg">
+              <div class="text-lg font-semibold text-blue-800">已购买时长套餐</div>
+              <div class="mt-2 grid grid-cols-2 gap-4">
+                <div>
+                  <span class="text-gray-600">套餐名称:</span>
+                  <span class="ml-2 font-medium">{{ durationData.name }}</span>
+                </div>
+                <div>
+                  <span class="text-gray-600">剩余时长:</span>
+                  <span class="ml-2 font-medium">{{ durationData.remainingDays }}天</span>
+                </div>
+                <div>
+                  <span class="text-gray-600">有效期至:</span>
+                  <span class="ml-2 font-medium">{{ durationData.expireDate }}</span>
+                </div>
+              </div>
+              <div class="mt-2 text-sm text-gray-500">
+                在有效期内使用AI模型不会消耗Token
+              </div>
+            </div>
+
             <n-data-table
               :columns="columns"
               :data="aiModels"
@@ -27,14 +48,13 @@
       </div>
     </div>
   </n-config-provider>
-  
 </template>
 
 <script>
 import Header from '../../PublicComponents/Header.vue';
 import LeftSmallList from '../../PublicComponents/LeftSmallList.vue';
 import { NCard, NDataTable, NButton, NTag } from 'naive-ui';
-import { defineComponent } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import { NConfigProvider } from 'naive-ui';
 import router from '../../../router';
 
@@ -49,6 +69,16 @@ export default defineComponent({
     NConfigProvider
   },
   setup() {
+    // 是否有时长套餐
+    const hasDuration = ref(true);
+    
+    // 时长套餐数据
+    const durationData = ref({
+      name: '年卡',
+      remainingDays: 180,
+      expireDate: '2025-11-22'
+    });
+
     // 表格列定义
     const columns = [
       {
@@ -75,29 +105,30 @@ export default defineComponent({
       },
     ];
 
-    // 模拟数据
-    const aiModels = [
-      {
-        model: 'GPT-4',
-        remainingTokens: 125000,
-        totalTokens: 500000
-      },
-      {
-        model: 'Claude 2',
-        remainingTokens: 75000,
-        totalTokens: 300000
-      },
-      {
-        model: 'DeepSeek',
-        remainingTokens: 5000,
-        totalTokens: 100000
-      },
-      {
-        model: 'Llama 2',
-        remainingTokens: 250000,
-        totalTokens: 500000
-      }
-    ];
+    const aiModels = computed(() => {
+      return [
+        {
+          model: 'GPT-4',
+          remainingTokens: 125000,
+          totalTokens: 500000
+        },
+        {
+          model: 'Claude 2',
+          remainingTokens: 75000,
+          totalTokens: 300000
+        },
+        {
+          model: 'DeepSeek',
+          remainingTokens: 5000,
+          totalTokens: 100000
+        },
+        {
+          model: 'Llama 2',
+          remainingTokens: 250000,
+          totalTokens: 500000
+        }
+      ];
+    });
 
     // 跳转到购买页面
     const goToPurchase = () => {
@@ -113,6 +144,8 @@ export default defineComponent({
     };
 
     return {
+      hasDuration,
+      durationData,
       columns,
       aiModels,
       goToPurchase,
@@ -129,5 +162,9 @@ export default defineComponent({
 
 .n-data-table {
   margin-bottom: 24px;
+}
+
+.bg-blue-50 {
+  background-color: #eff6ff;
 }
 </style>

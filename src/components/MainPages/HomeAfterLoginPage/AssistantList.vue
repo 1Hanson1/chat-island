@@ -2,6 +2,7 @@
 import { NScrollbar} from 'naive-ui'
 import { useAssistantStore } from '../../../stores/assistantStore'
 import { storeToRefs } from 'pinia'
+import router from '../../../router'
 
 const assistantStore = useAssistantStore()
 const { assistants, currentAssistant } = storeToRefs(assistantStore)
@@ -40,7 +41,7 @@ function selectAssistant(assistant) {
         </div>
       </n-scrollbar>
     </div>
-    <button class="m-4 p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+    <button @click="router.push('/assistantSquareMain')" class="m-4 p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
       添加助手
     </button>
   </aside>

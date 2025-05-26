@@ -6,31 +6,23 @@ export const useAssistantStore = defineStore('assistant', () => {
     {
       id: 0,
       name: '随便聊聊',
-      historys: [
-      ],
+      description: '普通聊天助手',
+      tags: ['聊天'],
+      historys: [],
     },
     {
       id: 1,
       name: '写作助手',
-      historys: [
-        
-      ],
+      description: '帮助撰写各类文章',
+      tags: ['写作'],
+      historys: [],
     },
     {
       id: 2,
       name: '编程助手',
-      historys: [
-        // {
-        //   id: 1,
-        //   title: '欢迎使用编程助手',
-        //   message: [{id: 1, talker: 'ai', content: '你好，我是编程助手，有什么可以帮助您？'}]
-        // },
-        // {
-        //   id: 2,
-        //   title: '欢迎使用编程助手',
-        //   message: [{id: 1, talker: 'ai', content: '你好，我是编程助手，有什么可以帮助您？'}]
-        // }
-      ],
+      description: '解答编程问题',
+      tags: ['编程'],
+      historys: [],
     },
   ])
   
@@ -43,6 +35,27 @@ export const useAssistantStore = defineStore('assistant', () => {
 
   function setCurrentHistory(historyId) {
     currentHistoryID.value = historyId
+  }
+
+  // 检查助手是否已存在
+  function hasAssistant(assistantName) {
+    return assistants.value.some(a => a.name === assistantName)
+  }
+
+  // 添加新助手
+  function addAssistant(assistant) {
+    if (!hasAssistant(assistant.name)) {
+      const newAssistant = {
+        id: Date.now(),
+        name: assistant.name,
+        description: assistant.description || '',
+        tags: assistant.tags || [],
+        historys: []
+      }
+      assistants.value.push(newAssistant)
+      return newAssistant
+    }
+    return null
   }
 
   // 创建历史记录
@@ -86,8 +99,6 @@ export const useAssistantStore = defineStore('assistant', () => {
             talker,
             content
           })
-        } 
-        else {
         }
       }
     }
@@ -99,6 +110,8 @@ export const useAssistantStore = defineStore('assistant', () => {
     currentHistoryID,
     setCurrentHistory,
     setCurrentAssistant,
+    hasAssistant,
+    addAssistant,
     createHistory,
     addHistory,
   }
