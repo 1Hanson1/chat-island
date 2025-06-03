@@ -83,6 +83,16 @@
                 >
                   添加助手
                 </n-button>
+                <n-modal
+                  v-model:show="showConfirmModal"
+                  preset="dialog"
+                  title="确认添加助手"
+                  positive-text="确认"
+                  negative-text="取消"
+                  @positive-click="confirmAddAssistant"
+                >
+                  <p>确定要添加助手 "{{ currentAssistant?.name }}" 吗？</p>
+                </n-modal>
               </template>
             </n-card>
           </div>
@@ -102,7 +112,7 @@
 </template>
 
 <script>  
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { 
   NCard, 
   NButton, 
@@ -112,7 +122,9 @@ import {
   NTag, 
   NSpace, 
   NPagination, 
-  NConfigProvider 
+  NConfigProvider,
+  NModal,
+  useMessage
 } from 'naive-ui';
 import { Search } from '@vicons/ionicons5';
 import Header from '../../PublicComponents/Header.vue';
@@ -144,7 +156,8 @@ export default defineComponent({
     NTag,
     NSpace,
     NPagination,
-    NConfigProvider
+    NConfigProvider,
+    NModal,
   },
   setup() {
     const assistantStore = useAssistantStore();
@@ -167,9 +180,20 @@ export default defineComponent({
     }
   },
   methods: {
+    showConfirmModal: ref(false),
+    currentAssistant: ref(null),
+    message: useMessage(),
+
     addAssistant(assistant) {
-      this.assistantStore.addAssistant(assistant);
-      this.$message.success(`${assistant.name} 已添加到您的助手列表`);
+      this.currentAssistant = assistant;
+      this.showConfirmModal = true;
+    },
+    confirmAddAssistant() {
+      if (this.currentAssistant) {
+        this.assistantStore.addAssistant(this.currentAssistant);
+        this.showConfirmModal = false;
+        this.currentAssistant = null;
+      }
     },
     viewAssistantDetails(assistant) {
       this.$router.push(`/assistant/${assistant.id}`);

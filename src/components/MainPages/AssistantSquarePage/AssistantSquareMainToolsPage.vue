@@ -98,11 +98,22 @@
         </div>
       </div>
     </div>
+
+    <n-modal
+      v-model:show="showConfirmModal"
+      preset="dialog"
+      title="确认添加工具"
+      positive-text="确认"
+      negative-text="取消"
+      @positive-click="confirmAddTool"
+    >
+      <p>确定要添加工具 "{{ currentTool?.name }}" 吗？</p>
+    </n-modal>
   </n-config-provider>
 </template>
 
 <script>  
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { 
   NCard, 
   NButton, 
@@ -112,7 +123,9 @@ import {
   NTag, 
   NSpace, 
   NPagination, 
-  NConfigProvider 
+  NConfigProvider,
+  NModal,
+  useMessage
 } from 'naive-ui';
 import { Search } from '@vicons/ionicons5';
 import Header from '../../PublicComponents/Header.vue';
@@ -144,7 +157,8 @@ export default defineComponent({
     NTag,
     NSpace,
     NPagination,
-    NConfigProvider
+    NConfigProvider,
+    NModal,
   },
   setup() {
     const assistantStore = useAssistantStore();
@@ -167,14 +181,23 @@ export default defineComponent({
     }
   },
   methods: {
+    showConfirmModal: ref(false),
+    currentTool: ref(null),
+    message: useMessage(),
     addTool(tool) {
-      const assistant = {
+      this.currentTool = {
         name: tool.name,
         description: tool.description,
         tags: tool.tags
       };
-      this.assistantStore.addAssistant(assistant);
-      this.$message.success(`${tool.name} 已添加到您的助手列表`);
+      this.showConfirmModal = true;
+    },
+    confirmAddTool() {
+      if (this.currentTool) {
+        this.assistantStore.addAssistant(this.currentTool);
+        this.showConfirmModal = false;
+        this.currentTool = null;
+      }
     },
     viewToolDetails(tool) {
       this.$router.push(`/assistant/${tool.id}`);

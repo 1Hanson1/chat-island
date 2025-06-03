@@ -94,6 +94,28 @@
                 </n-card>
               </div>
             </div>
+
+            <!-- 快速创建助手区域 -->
+            <div class="mb-8">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">快速创建助手</h2>
+                <n-button
+                  text
+                  type="primary"
+                  @click="$router.push('/quickCreate')"
+                >
+                  立即创建
+                  <template #icon>
+                    <n-icon>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                      </svg>
+                    </n-icon>
+                  </template>
+                </n-button>
+              </div>
+              <p class="text-gray-500 mb-4">通过我们的快速创建工具，只需简单几步即可打造属于您的专属AI助手。</p>
+            </div>
           </n-card>
         
           

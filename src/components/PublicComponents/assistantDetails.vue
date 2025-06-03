@@ -63,11 +63,22 @@
         </div>
       </div>
     </div>
+
+    <n-modal
+      v-model:show="showConfirmModal"
+      preset="dialog"
+      title="确认添加助手"
+      positive-text="确认"
+      negative-text="取消"
+      @positive-click="confirmAddAssistant"
+    >
+      <p>确定要添加助手 "{{ assistant.name }}" 吗？</p>
+    </n-modal>
   </n-config-provider>
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { 
   NButton, 
   NIcon, 
@@ -75,7 +86,9 @@ import {
   NTag, 
   NSpace,
   NCard,
-  NConfigProvider
+  NConfigProvider,
+  NModal,
+  useMessage
 } from 'naive-ui';
 import Header from './Header.vue';
 import LeftSmallList from './LeftSmallList.vue';
@@ -101,7 +114,8 @@ export default defineComponent({
     NTag,
     NSpace,
     NCard,
-    NConfigProvider
+    NConfigProvider,
+    NModal,
   },
   setup() {
     const assistantStore = useAssistantStore();
@@ -119,9 +133,15 @@ export default defineComponent({
                      {};
   },
   methods: {
+    showConfirmModal: ref(false),
+    message: useMessage(),
     addAssistant() {
+      this.showConfirmModal = true;
+    },
+    confirmAddAssistant() {
       this.assistantStore.addAssistant(this.assistant);
-      this.$message.success(`${this.assistant.name} 已添加到您的助手列表`);
+      this.message.success(`${this.assistant.name} 已添加到您的助手列表`);
+      this.showConfirmModal = false;
     }
   }
 });
