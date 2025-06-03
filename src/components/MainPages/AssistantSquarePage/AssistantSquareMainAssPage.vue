@@ -118,6 +118,7 @@ import { Search } from '@vicons/ionicons5';
 import Header from '../../PublicComponents/Header.vue';
 import LeftSmallList from '../../PublicComponents/LeftSmallList.vue';
 import { useAssistantStore } from '../../../stores/assistantStore';
+import { assistantSquareData } from '../../../stores/assistantSquareData';
 
 const themeOverrides = {
   common: {
@@ -151,61 +152,18 @@ export default defineComponent({
     return { 
       assistantStore,
       Search,
-      themeOverrides
+      themeOverrides,
+      assistantSquareData
     };
   },
   data() {
     return {
-      searchQuery: '',
-      assistants: [
-        {
-          id: 1,
-          name: '写作助手',
-          description: '帮助您撰写各类文章和文档',
-          tags: ['写作', '文档']
-        },
-        {
-          id: 2,
-          name: '编程助手',
-          description: '解答编程问题，提供代码示例',
-          tags: ['编程', '代码']
-        },
-        {
-          id: 3,
-          name: '学习助手',
-          description: '辅助学习新知识和技能',
-          tags: ['学习', '教育']
-        },
-        {
-          id: 4,
-          name: '翻译助手',
-          description: '多语言翻译工具',
-          tags: ['翻译', '语言']
-        },
-        {
-          id: 5,
-          name: '数据分析',
-          description: '帮助分析数据并提供见解',
-          tags: ['数据', '分析']
-        },
-        {
-          id: 6,
-          name: '营销助手',
-          description: '创建营销内容和策略',
-          tags: ['营销', '广告']
-        }
-      ]
+      searchQuery: ''
     }
   },
   computed: {
     filteredAssistants() {
-      if (!this.searchQuery) return this.assistants;
-      const query = this.searchQuery.toLowerCase();
-      return this.assistants.filter(a => 
-        a.name.toLowerCase().includes(query) || 
-        a.description.toLowerCase().includes(query) ||
-        a.tags.some(tag => tag.toLowerCase().includes(query))
-      );
+      return assistantSquareData.searchAssistants(this.searchQuery);
     }
   },
   methods: {
@@ -214,7 +172,7 @@ export default defineComponent({
       this.$message.success(`${assistant.name} 已添加到您的助手列表`);
     },
     viewAssistantDetails(assistant) {
-      this.$message.info(`查看 ${assistant.name} 的详细信息`);
+      this.$router.push(`/assistant/${assistant.id}`);
     }
   }
 });

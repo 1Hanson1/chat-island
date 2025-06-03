@@ -118,6 +118,7 @@ import { Search } from '@vicons/ionicons5';
 import Header from '../../PublicComponents/Header.vue';
 import LeftSmallList from '../../PublicComponents/LeftSmallList.vue';
 import { useAssistantStore } from '../../../stores/assistantStore';
+import { assistantSquareData } from '../../../stores/assistantSquareData';
 
 const themeOverrides = {
   common: {
@@ -151,61 +152,18 @@ export default defineComponent({
     return { 
       assistantStore,
       Search,
-      themeOverrides
+      themeOverrides,
+      assistantSquareData
     };
   },
   data() {
     return {
-      searchQuery: '',
-      tools: [
-        {
-          id: 1,
-          name: 'PDF转换',
-          description: 'PDF文件转换和编辑工具',
-          tags: ['PDF', '转换']
-        },
-        {
-          id: 2,
-          name: '图片处理',
-          description: '在线图片编辑和优化',
-          tags: ['图片', '编辑']
-        },
-        {
-          id: 3,
-          name: '翻译插件',
-          description: '多语言实时翻译工具',
-          tags: ['翻译', '语言']
-        },
-        {
-          id: 4,
-          name: '代码格式化',
-          description: '代码格式化和美化工具',
-          tags: ['代码', '开发']
-        },
-        {
-          id: 5,
-          name: '数据可视化',
-          description: '创建数据图表和可视化',
-          tags: ['数据', '图表']
-        },
-        {
-          id: 6,
-          name: '视频压缩',
-          description: '在线视频压缩和转换',
-          tags: ['视频', '压缩']
-        }
-      ]
+      searchQuery: ''
     }
   },
   computed: {
     filteredTools() {
-      if (!this.searchQuery) return this.tools;
-      const query = this.searchQuery.toLowerCase();
-      return this.tools.filter(t => 
-        t.name.toLowerCase().includes(query) || 
-        t.description.toLowerCase().includes(query) ||
-        t.tags.some(tag => tag.toLowerCase().includes(query))
-      );
+      return assistantSquareData.searchTools(this.searchQuery);
     }
   },
   methods: {
@@ -219,7 +177,7 @@ export default defineComponent({
       this.$message.success(`${tool.name} 已添加到您的助手列表`);
     },
     viewToolDetails(tool) {
-      this.$message.info(`查看 ${tool.name} 的详细信息`);
+      this.$router.push(`/assistant/${tool.id}`);
     }
   }
 });

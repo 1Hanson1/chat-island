@@ -5,6 +5,7 @@ import Check from '../components/MainPages/CheckHavePage/CheckHavePage.vue';
 import AssistantSquareMain from '../components/MainPages/AssistantSquarePage/AssistantSquareMainPage.vue';
 import AssistantSquareMainAssPage from '../components/MainPages/AssistantSquarePage/AssistantSquareMainAssPage.vue';
 import AssistantSquareMainToolsPage from '../components/MainPages/AssistantSquarePage/AssistantSquareMainToolsPage.vue';
+import AssistantDetails from '../components/PublicComponents/assistantDetails.vue';
 import Purchase from '../components/MainPages/PurchasePage/PurchasePage.vue';
 import Login from '../components/MainPages/LoginPage/LoginPage.vue';
 import LoginSA from '../components/MainPages/LoginPage/LoginSAPage.vue';
@@ -29,6 +30,7 @@ const router = createRouter({
     { path: '/assistantSquareMain', name: 'AssistantSquareMain', component: AssistantSquareMain, meta: { requiresAuth: true } },
     { path: '/assistantSquareMainAssPage', name: 'AssistantSquareMainAssPage', component: AssistantSquareMainAssPage, meta: { requiresAuth: true } },
     { path: '/assistantSquareMainToolsPage', name: 'AssistantSquareMainToolsPage', component: AssistantSquareMainToolsPage, meta: { requiresAuth: true } },
+    { path: '/assistant/:id', name: 'AssistantDetails', component: AssistantDetails, meta: { requiresAuth: true }, props: true },
     { path: '/purchase', name: 'Purchase', component: Purchase, meta: { requiresAuth: true } },
     { path: '/login', name: 'Login', component: Login },
     { path: '/login/SA', name: 'LoginSA', component: LoginSA },

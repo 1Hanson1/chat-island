@@ -11,6 +11,13 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated.value = value
   }
 
+  function login(username, password) {
+    isAuthenticated.value = true
+    user.value = { username, password }
+    localStorage.setItem('isAuthenticated', 'true')
+    localStorage.setItem('user', JSON.stringify({ username, password }))
+  }
+
   function loginSA(username, password, role) {
     isAuthenticated.value = true
     user.value = { username, password, role }
@@ -33,6 +40,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     user,
     changeIsAuthenticated,
+    login,
     loginSA,
     logout,
     registerSA
