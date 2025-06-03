@@ -2,14 +2,16 @@
 import { ref, watch, computed } from 'vue';
 import { storeToRefs } from 'pinia'
 import { useAssistantStore } from '../../../stores/assistantStore'
+import { useRouter } from 'vue-router'
 import { Add } from '@vicons/ionicons5'
 import { IosSettings } from '@vicons/ionicons4'
 import { DeleteRound } from '@vicons/material'
 import { Icon } from '@vicons/utils'
 
-
+const router = useRouter()
 const assistantStore = useAssistantStore()
-const { currentAssistant, currentHistoryID} = storeToRefs(assistantStore)
+const { currentAssistant, currentHistoryID } = storeToRefs(assistantStore)
+const { deleteAssistant: deleteAssistantStore } = assistantStore
 
 const messages = computed(() => {
   const currentAssistant = assistantStore.currentAssistant
@@ -57,11 +59,17 @@ function createNewChat() {
 }
 
 function setAssistant() {
-
+  if (currentAssistant.value) {
+    router.push(`/assistant/${currentAssistant.value.id}`)
+  }
 }
 
 function deleteAssistant() {
-
+  if (currentAssistant.value && currentAssistant.value.id !== 0) {
+    if (confirm(`确定要删除助手 "${currentAssistant.value.name}" 吗？`)) {
+      deleteAssistantStore(currentAssistant.value.id)
+    }
+  }
 }
 
 </script>

@@ -104,6 +104,22 @@ export const useAssistantStore = defineStore('assistant', () => {
     }
   }
 
+  // 删除助手
+  function deleteAssistant(assistantId) {
+    if (assistantId === 0) return false // 不允许删除"随便聊聊"助手
+    
+    const index = assistants.value.findIndex(a => a.id === assistantId)
+    if (index !== -1) {
+      assistants.value.splice(index, 1)
+      // 如果删除的是当前选中的助手，则重置为第一个助手
+      if (currentAssistant.value?.id === assistantId) {
+        currentAssistant.value = assistants.value[0] || null
+      }
+      return true
+    }
+    return false
+  }
+
   return {
     assistants,
     currentAssistant,
@@ -114,5 +130,6 @@ export const useAssistantStore = defineStore('assistant', () => {
     addAssistant,
     createHistory,
     addHistory,
+    deleteAssistant,
   }
 })

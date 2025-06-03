@@ -22,7 +22,7 @@
               </template>
               返回
             </n-button>
-          <h1 class="text-2xl font-bold">{{ assistant.name || '助手' }}详情</h1>
+            <h1 class="text-2xl font-bold">{{ tool.name || '工具' }}详情</h1>
           </div>
 
           <n-card>
@@ -32,15 +32,15 @@
                 :style="{ backgroundColor: '#eff6ff', color: '#3b82f6' }"
                 size="large"
               >
-                {{ assistant.name ? assistant.name.charAt(0) : '?' }}
+                {{ tool.name ? tool.name.charAt(0) : '?' }}
               </n-avatar>
               <div>
-                <h2 class="text-xl font-semibold mb-2">{{ assistant.name }}</h2>
-                <p class="text-gray-600 mb-4">{{ assistant.description }}</p>
+                <h2 class="text-xl font-semibold mb-2">{{ tool.name }}</h2>
+                <p class="text-gray-600 mb-4">{{ tool.description }}</p>
                 
                 <n-space :size="[8, 8]" class="mb-6">
                   <n-tag
-                    v-for="tag in assistant.tags"
+                    v-for="tag in tool.tags"
                     :key="tag"
                     type="info"
                     round
@@ -49,15 +49,15 @@
                   </n-tag>
                 </n-space>
 
-                <n-button type="primary" @click="addAssistant" :disabled="isLoading">
-                  添加此助手
+                <n-button type="primary" @click="addTool" :disabled="isLoading">
+                  添加此工具
                 </n-button>
               </div>
             </div>
 
             <div class="mt-8">
               <h3 class="text-lg font-medium mb-4">功能说明</h3>
-              <p class="text-gray-700">{{ assistant.details || '暂无详细功能说明' }}</p>
+              <p class="text-gray-700">{{ tool.details || '暂无详细功能说明' }}</p>
             </div>
           </n-card>
         </div>
@@ -67,12 +67,12 @@
     <n-modal
       v-model:show="showConfirmModal"
       preset="dialog"
-      title="确认添加助手"
+      title="确认添加工具"
       positive-text="确认"
       negative-text="取消"
-      @positive-click="confirmAddAssistant"
+      @positive-click="confirmAddTool"
     >
-      <p>确定要添加助手 "{{ assistant.name }}" 吗？</p>
+      <p>确定要添加工具 "{{ tool.name }}" 吗？</p>
     </n-modal>
   </n-config-provider>
 </template>
@@ -104,7 +104,7 @@ const themeOverrides = {
 };
 
 export default defineComponent({
-  name: 'AssistantDetails',
+  name: 'ToolDetails',
   components: { 
     Header,
     LeftSmallList,
@@ -120,7 +120,7 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const assistantStore = useAssistantStore();
-    const assistant = ref({
+    const tool = ref({
       name: '',
       description: '',
       tags: [],
@@ -129,20 +129,12 @@ export default defineComponent({
     const showConfirmModal = ref(false);
     const isLoading = ref(true);
 
-    const isTool = ref(false);
-
     onMounted(async () => {
       try {
         const id = parseInt(route.params.id);
-        isTool.value = route.name === 'ToolDetails';
-        
-        if (isTool.value) {
-          assistant.value = assistantSquareData.allTools.find(t => t.id === id) || {};
-        } else {
-          assistant.value = assistantSquareData.allAssistants.find(a => a.id === id) || {};
-        }
+        tool.value = assistantSquareData.allTools.find(t => t.id === id) || {};
 
-        if (!assistant.value.id) {
+        if (!tool.value.id) {
           router.back();
         }
       } catch (error) {
@@ -152,22 +144,22 @@ export default defineComponent({
       }
     });
 
-    const addAssistant = () => {
+    const addTool = () => {
       showConfirmModal.value = true;
     };
 
-    const confirmAddAssistant = () => {
-      assistantStore.addAssistant(assistant.value);
+    const confirmAddTool = () => {
+      assistantStore.addAssistant(tool.value);
       showConfirmModal.value = false;
     };
 
     return {
       assistantStore,
       themeOverrides,
-      assistant,
+      tool,
       showConfirmModal,
-      addAssistant,
-      confirmAddAssistant
+      addTool,
+      confirmAddTool
     };
   }
 });
