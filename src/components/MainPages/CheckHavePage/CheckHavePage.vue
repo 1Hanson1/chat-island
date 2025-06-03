@@ -54,9 +54,10 @@
 import Header from '../../PublicComponents/Header.vue';
 import LeftSmallList from '../../PublicComponents/LeftSmallList.vue';
 import { NCard, NDataTable, NButton, NTag } from 'naive-ui';
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, computed } from 'vue';
 import { NConfigProvider } from 'naive-ui';
 import router from '../../../router';
+import { useHaveStore } from '../../../stores/HaveStore';
 
 export default defineComponent({
   components: { 
@@ -69,15 +70,7 @@ export default defineComponent({
     NConfigProvider
   },
   setup() {
-    // 是否有时长套餐
-    const hasDuration = ref(true);
-    
-    // 时长套餐数据
-    const durationData = ref({
-      name: '年卡',
-      remainingDays: 180,
-      expireDate: '2025-11-22'
-    });
+    const haveStore = useHaveStore();
 
     // 表格列定义
     const columns = [
@@ -86,49 +79,24 @@ export default defineComponent({
         key: 'model',
         align: 'center'
       },
-      {
-        title: '剩余Token',
-        key: 'remainingTokens',
-        align: 'center',
-        render(row) {
-          return `${row.remainingTokens.toLocaleString()} / ${row.totalTokens.toLocaleString()}`;
-        }
-      },
+    {
+      title: '已用Token',
+      key: 'usedTokens',
+      align: 'center',
+      render(row) {
+        return `${row.usedTokens.toLocaleString()} / ${row.totalTokens.toLocaleString()}`;
+      }
+    },
       {
         title: '使用比例',
         key: 'usageRatio',
         align: 'center',
         render(row) {
-          const ratio = (row.remainingTokens / row.totalTokens * 100).toFixed(1);
+        const ratio = (row.usedTokens / row.totalTokens * 100).toFixed(1);
           return `${ratio}%`;
         }
       },
     ];
-
-    const aiModels = computed(() => {
-      return [
-        {
-          model: 'GPT-4',
-          remainingTokens: 125000,
-          totalTokens: 500000
-        },
-        {
-          model: 'Claude 2',
-          remainingTokens: 75000,
-          totalTokens: 300000
-        },
-        {
-          model: 'DeepSeek',
-          remainingTokens: 5000,
-          totalTokens: 100000
-        },
-        {
-          model: 'Llama 2',
-          remainingTokens: 250000,
-          totalTokens: 500000
-        }
-      ];
-    });
 
     // 跳转到购买页面
     const goToPurchase = () => {
@@ -144,10 +112,10 @@ export default defineComponent({
     };
 
     return {
-      hasDuration,
-      durationData,
+      hasDuration: haveStore.hasDuration,
+      durationData: haveStore.durationData,
       columns,
-      aiModels,
+      aiModels: haveStore.aiModels,
       goToPurchase,
       themeOverrides
     };

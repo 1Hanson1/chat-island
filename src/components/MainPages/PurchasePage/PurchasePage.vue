@@ -10,10 +10,10 @@
               <n-tab-pane name="token" tab="按Token量购买">
                 <div class="mb-4">
                   <n-select
-                    v-model:value="selectedModel"
-                    :options="modelOptions"
+                    :options="purchaseStore.modelOptions"
                     placeholder="请选择模型"
                     clearable
+                    @update:value="setSelectedModel"
                   />
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
@@ -22,7 +22,7 @@
                     :key="index"
                     :class="{'border-2 border-blue-500': selectedTokenPlan === index}"
                     hoverable
-                    @click="selectedTokenPlan = index, activeTab = 'token'"
+                    @click="selectTokenPlan(index)"
                   >
                     <template #header>
                       <div class="text-xl font-bold">{{ plan.name }}</div>
@@ -52,7 +52,7 @@
                     :key="index"
                     :class="{'border-2 border-blue-500': selectedDurationPlan === index}"
                     hoverable
-                    @click="selectedDurationPlan = index, activeTab = 'duration'"
+                    @click="selectDurationPlan(index)"
                   >
                     <template #header>
                       <div class="text-xl font-bold">{{ plan.name }}</div>
@@ -99,7 +99,7 @@
                 </span>
 
               </div>
-              <n-button type="primary" size="large" @click="handlePurchase">
+              <n-button type="primary" size="large" @click="handlePurchase()">
                 立即购买
               </n-button>
             </div>
@@ -111,10 +111,11 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
-import { NCard, NTabs, NTabPane, NButton, NIcon, NConfigProvider,NSelect } from 'naive-ui';
+import { NCard, NTabs, NTabPane, NButton, NIcon, NConfigProvider, NSelect } from 'naive-ui';
 import Header from '../../PublicComponents/Header.vue';
 import LeftSmallList from '../../PublicComponents/LeftSmallList.vue';
+import { usePurchaseStore } from '../../../stores/Purchase';
+import { storeToRefs } from 'pinia';
 
 export default {
   components: {
@@ -129,29 +130,8 @@ export default {
     NSelect
   },
   setup() {
-    const activeTab = ref('token');
-    const selectedModel = ref(null);
-    const selectedTokenPlan = ref(0);
-    const selectedDurationPlan = ref(0);
-
-    const tokenPlans = ref([
-      { name: '基础套餐', tokens: '100万', price: 10, unitPrice: 1 },
-      { name: '标准套餐', tokens: '500万', price: 45, unitPrice: 0.9 },
-      { name: '高级套餐', tokens: '2000万', price: 160, unitPrice: 0.8 }
-    ]);
-
-    const durationPlans = ref([
-      { name: '月卡', duration: '30天', price: 30, dailyPrice: 1 },
-      { name: '季卡', duration: '90天', price: 80, dailyPrice: 0.89 },
-      { name: '年卡', duration: '365天', price: 299, dailyPrice: 0.82 }
-    ]);
-
-    const modelOptions = [
-      { label: 'GPT-4', value: 'GPT-4' },
-      { label: 'Claude 2', value: 'Claude 2' },
-      { label: 'DeepSeek', value: 'DeepSeek' },
-      { label: 'Llama 2', value: 'Llama 2' }
-    ];
+    const purchaseStore = usePurchaseStore();
+    const { activeTab, selectedModel, selectedTokenPlan, selectedDurationPlan, tokenPlans, durationPlans, modelOptions} = storeToRefs(purchaseStore);
 
     const themeOverrides = {
       common: {
@@ -161,32 +141,20 @@ export default {
       }
     };
 
-    const handlePurchase = () => {
-      const plan = activeTab.value === 'token'
-        ? {
-            ...tokenPlans.value[selectedTokenPlan.value],
-            model: selectedModel.value?.label || '未选择模型'
-          }
-        : durationPlans.value[selectedDurationPlan.value];
-
-      console.log(selectedModel.value);
-      console.log('购买套餐:', plan);
-      // 这里可以添加实际的购买逻辑
-    };
-
-
     return {
       activeTab,
       selectedModel,
       selectedTokenPlan,
       selectedDurationPlan,
-
       tokenPlans,
       durationPlans,
       modelOptions,
-
-      themeOverrides,
-      handlePurchase
+      purchaseStore,
+      setSelectedModel: purchaseStore.setSelectedModel,
+      selectTokenPlan: purchaseStore.selectTokenPlan,
+      selectDurationPlan: purchaseStore.selectDurationPlan,
+      handlePurchase: purchaseStore.handlePurchase,
+      themeOverrides
     };
   }
 };

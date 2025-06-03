@@ -138,6 +138,7 @@ import {
 import Header from '../../PublicComponents/Header.vue';
 import LeftSmallList from '../../PublicComponents/LeftSmallList.vue';
 import { assistantSquareData } from '../../../stores/assistantSquareData';
+import router from '../../../router';
 
 const themeOverrides = {
   common: {
@@ -177,7 +178,8 @@ export default defineComponent({
       recommendedAssistants,
       recommendedTools,
       viewAssistants,
-      viewTools
+      viewTools,
+      router
     };
   }
 });
