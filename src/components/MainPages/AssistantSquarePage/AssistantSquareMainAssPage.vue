@@ -112,7 +112,8 @@
 </template>
 
 <script>  
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { 
   NCard, 
   NButton, 
@@ -124,7 +125,6 @@ import {
   NPagination, 
   NConfigProvider,
   NModal,
-  useMessage
 } from 'naive-ui';
 import { Search } from '@vicons/ionicons5';
 import Header from '../../PublicComponents/Header.vue';
@@ -161,43 +161,48 @@ export default defineComponent({
   },
   setup() {
     const assistantStore = useAssistantStore();
+    const route = useRoute();
+    const router = useRouter();
     
+    const searchQuery = ref('');
+    const showConfirmModal = ref(false);
+    const currentAssistant = ref(null);
+    const isLoading = ref(false);
+
+    const filteredAssistants = computed(() => {
+      return assistantSquareData.searchAssistants(searchQuery.value);
+    });
+
+    const addAssistant = (assistant) => {
+      currentAssistant.value = assistant;
+      showConfirmModal.value = true;
+    };
+
+    const confirmAddAssistant = () => {
+      if (currentAssistant.value) {
+        assistantStore.addAssistant(currentAssistant.value);
+        showConfirmModal.value = false;
+        currentAssistant.value = null;
+      }
+    };
+
+    const viewAssistantDetails = (assistant) => {
+      router.push(`/assistant/${assistant.id}`);
+    };
+
     return { 
       assistantStore,
       Search,
       themeOverrides,
-      assistantSquareData
+      searchQuery,
+      filteredAssistants,
+      showConfirmModal,
+      currentAssistant,
+      isLoading,
+      addAssistant,
+      confirmAddAssistant,
+      viewAssistantDetails
     };
-  },
-  data() {
-    return {
-      searchQuery: ''
-    }
-  },
-  computed: {
-    filteredAssistants() {
-      return assistantSquareData.searchAssistants(this.searchQuery);
-    }
-  },
-  methods: {
-    showConfirmModal: ref(false),
-    currentAssistant: ref(null),
-    message: useMessage(),
-
-    addAssistant(assistant) {
-      this.currentAssistant = assistant;
-      this.showConfirmModal = true;
-    },
-    confirmAddAssistant() {
-      if (this.currentAssistant) {
-        this.assistantStore.addAssistant(this.currentAssistant);
-        this.showConfirmModal = false;
-        this.currentAssistant = null;
-      }
-    },
-    viewAssistantDetails(assistant) {
-      this.$router.push(`/assistant/${assistant.id}`);
-    }
   }
 });
 </script>

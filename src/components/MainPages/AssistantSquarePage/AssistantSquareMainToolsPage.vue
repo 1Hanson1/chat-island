@@ -113,7 +113,8 @@
 </template>
 
 <script>  
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { 
   NCard, 
   NButton, 
@@ -125,7 +126,6 @@ import {
   NPagination, 
   NConfigProvider,
   NModal,
-  useMessage
 } from 'naive-ui';
 import { Search } from '@vicons/ionicons5';
 import Header from '../../PublicComponents/Header.vue';
@@ -170,38 +170,54 @@ export default defineComponent({
       assistantSquareData
     };
   },
-  data() {
-    return {
-      searchQuery: ''
-    }
-  },
-  computed: {
-    filteredTools() {
-      return assistantSquareData.searchTools(this.searchQuery);
-    }
-  },
-  methods: {
-    showConfirmModal: ref(false),
-    currentTool: ref(null),
-    message: useMessage(),
-    addTool(tool) {
-      this.currentTool = {
+  setup() {
+    const assistantStore = useAssistantStore();
+    const route = useRoute();
+    const router = useRouter();
+    
+    const searchQuery = ref('');
+    const showConfirmModal = ref(false);
+    const currentTool = ref(null);
+    const isLoading = ref(false);
+
+    const filteredTools = computed(() => {
+      return assistantSquareData.searchTools(searchQuery.value);
+    });
+
+    const addTool = (tool) => {
+      currentTool.value = {
         name: tool.name,
         description: tool.description,
         tags: tool.tags
       };
-      this.showConfirmModal = true;
-    },
-    confirmAddTool() {
-      if (this.currentTool) {
-        this.assistantStore.addAssistant(this.currentTool);
-        this.showConfirmModal = false;
-        this.currentTool = null;
+      showConfirmModal.value = true;
+    };
+
+    const confirmAddTool = () => {
+      if (currentTool.value) {
+        assistantStore.addAssistant(currentTool.value);
+        showConfirmModal.value = false;
+        currentTool.value = null;
       }
-    },
-    viewToolDetails(tool) {
-      this.$router.push(`/assistant/${tool.id}`);
-    }
+    };
+
+    const viewToolDetails = (tool) => {
+      router.push({ name: 'ToolDetails', params: { id: tool.id } });
+    };
+
+    return { 
+      assistantStore,
+      Search,
+      themeOverrides,
+      searchQuery,
+      filteredTools,
+      showConfirmModal,
+      currentTool,
+      isLoading,
+      addTool,
+      confirmAddTool,
+      viewToolDetails
+    };
   }
 });
 </script>

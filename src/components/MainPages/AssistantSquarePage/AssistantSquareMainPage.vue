@@ -14,7 +14,7 @@
                 <n-button
                   text
                   type="primary"
-                  @click="$router.push('/assistantSquareMainAssPage')"
+                  @click="() => router.push('/assistantSquareMainAssPage')"
                 >
                   查看全部
                   <template #icon>
@@ -35,7 +35,7 @@
                   embedded
                   :bordered="false"
                   class="cursor-pointer transition-all hover:scale-[1.02]"
-                  @click="viewDetails(assistant)"
+                  @click="viewAssistants(assistant)"
                 >
                   <div class="flex items-start gap-3">
                     <n-avatar
@@ -58,7 +58,7 @@
                 <n-button
                   text
                   type="primary"
-                  @click="$router.push('/assistantSquareMainToolsPage')"
+                  @click="() => router.push('/assistantSquareMainToolsPage')"
                 >
                   查看全部
                   <template #icon>
@@ -79,7 +79,7 @@
                   embedded
                   :bordered="false"
                   class="cursor-pointer transition-all hover:scale-[1.02]"
-                  @click="viewDetails(tool)"
+                  @click="viewTools(tool)"
                 >
                   <div class="flex items-start gap-3">
                     <n-avatar
@@ -102,7 +102,7 @@
                 <n-button
                   text
                   type="primary"
-                  @click="$router.push('/quickCreate')"
+                  @click="() => router.push('/quickCreate')"
                 >
                   立即创建
                   <template #icon>
@@ -126,7 +126,8 @@
 </template>
 
 <script>  
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { 
   NCard, 
   NButton, 
@@ -158,21 +159,26 @@ export default defineComponent({
     NConfigProvider
   },
   setup() {
+    const router = useRouter();
+    const recommendedAssistants = ref(assistantSquareData.recommendedAssistants);
+    const recommendedTools = ref(assistantSquareData.recommendedTools);
+
+    const viewAssistants = (item) => {
+      router.push(`/assistant/${item.id}`);
+    };
+
+    const viewTools = (item) => {
+      router.push(`/tool/${item.id}`);
+    };
+
     return {
       themeOverrides,
-      assistantSquareData
+      assistantSquareData,
+      recommendedAssistants,
+      recommendedTools,
+      viewAssistants,
+      viewTools
     };
-  },
-  data() {
-    return {
-      recommendedAssistants: assistantSquareData.recommendedAssistants,
-      recommendedTools: assistantSquareData.recommendedTools
-    }
-  },
-  methods: {
-    viewDetails(item) {
-      this.$router.push(`/assistant/${item.id}`);
-    }
   }
 });
 </script>

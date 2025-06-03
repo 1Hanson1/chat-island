@@ -22,18 +22,18 @@
               </template>
               返回
             </n-button>
-            <h1 class="text-2xl font-bold">{{ assistant.name }}详情</h1>
+          <h1 class="text-2xl font-bold">{{ assistant.name || '助手' }}详情</h1>
           </div>
 
           <n-card>
             <div class="flex items-start gap-6">
-              <n-avatar
-                round
-                :style="{ backgroundColor: '#eff6ff', color: '#3b82f6' }"
-                size="large"
-              >
-                {{ assistant.name.charAt(0) }}
-              </n-avatar>
+  <n-avatar
+    round
+    :style="{ backgroundColor: '#eff6ff', color: '#3b82f6' }"
+    size="large"
+  >
+    {{ assistant.name ? assistant.name.charAt(0) : '?' }}
+  </n-avatar>
               <div>
                 <h2 class="text-xl font-semibold mb-2">{{ assistant.name }}</h2>
                 <p class="text-gray-600 mb-4">{{ assistant.description }}</p>
@@ -49,7 +49,7 @@
                   </n-tag>
                 </n-space>
 
-                <n-button type="primary" @click="addAssistant">
+                <n-button type="primary" @click="addAssistant" :disabled="isLoading">
                   添加此助手
                 </n-button>
               </div>
@@ -78,7 +78,8 @@
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { 
   NButton, 
   NIcon, 
@@ -88,7 +89,6 @@ import {
   NCard,
   NConfigProvider,
   NModal,
-  useMessage
 } from 'naive-ui';
 import Header from './Header.vue';
 import LeftSmallList from './LeftSmallList.vue';
@@ -118,35 +118,57 @@ export default defineComponent({
     NModal,
   },
   setup() {
+    const route = useRoute();
     const assistantStore = useAssistantStore();
-    return { assistantStore, themeOverrides };
-  },
-  data() {
-    return {
-      assistant: {}
+    const assistant = ref({
+      name: '',
+      description: '',
+      tags: [],
+      details: ''
+    });
+    const showConfirmModal = ref(false);
+    const isLoading = ref(true);
+
+    const isTool = ref(false);
+
+    onMounted(async () => {
+      try {
+        const id = parseInt(route.params.id);
+        isTool.value = route.name === 'ToolDetails';
+        
+        if (isTool.value) {
+          assistant.value = assistantSquareData.allTools.find(t => t.id === id) || {};
+        } else {
+          assistant.value = assistantSquareData.allAssistants.find(a => a.id === id) || {};
+        }
+
+        if (!assistant.value.id) {
+          router.back();
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        isLoading.value = false;
+      }
+    });
+
+    const addAssistant = () => {
+      showConfirmModal.value = true;
     };
-  },
-  created() {
-    const id = parseInt(this.$route.params.id);
-    this.assistant = assistantSquareData.allAssistants.find(a => a.id === id) || 
-                     assistantSquareData.allTools.find(t => t.id === id) || 
-                     {};
-  },
-  methods: {
-    showConfirmModal: ref(false),
-    message: useMessage(),
-    addAssistant() {
-      this.showConfirmModal = true;
-    },
-    confirmAddAssistant() {
-      this.assistantStore.addAssistant(this.assistant);
-      this.message.success(`${this.assistant.name} 已添加到您的助手列表`);
-      this.showConfirmModal = false;
-    }
+
+    const confirmAddAssistant = () => {
+      assistantStore.addAssistant(assistant.value);
+      showConfirmModal.value = false;
+    };
+
+    return {
+      assistantStore,
+      themeOverrides,
+      assistant,
+      showConfirmModal,
+      addAssistant,
+      confirmAddAssistant
+    };
   }
 });
 </script>
-
-<style scoped>
-/* 可以添加一些自定义样式 */
-</style>

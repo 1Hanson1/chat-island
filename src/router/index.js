@@ -31,6 +31,7 @@ const router = createRouter({
     { path: '/assistantSquareMainAssPage', name: 'AssistantSquareMainAssPage', component: AssistantSquareMainAssPage, meta: { requiresAuth: true } },
     { path: '/assistantSquareMainToolsPage', name: 'AssistantSquareMainToolsPage', component: AssistantSquareMainToolsPage, meta: { requiresAuth: true } },
     { path: '/assistant/:id', name: 'AssistantDetails', component: AssistantDetails, meta: { requiresAuth: true }, props: true },
+    { path: '/tool/:id', name: 'ToolDetails', component: AssistantDetails, meta: { requiresAuth: true }, props: true },
     { path: '/purchase', name: 'Purchase', component: Purchase, meta: { requiresAuth: true } },
     { path: '/login', name: 'Login', component: Login },
     { path: '/login/SA', name: 'LoginSA', component: LoginSA },
