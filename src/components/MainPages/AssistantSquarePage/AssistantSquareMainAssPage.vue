@@ -83,16 +83,7 @@
                 >
                   添加助手
                 </n-button>
-                <n-modal
-                  v-model:show="showConfirmModal"
-                  preset="dialog"
-                  title="确认添加助手"
-                  positive-text="确认"
-                  negative-text="取消"
-                  @positive-click="confirmAddAssistant"
-                >
-                  <p>确定要添加助手 "{{ currentAssistant?.name }}" 吗？</p>
-                </n-modal>
+
               </template>
             </n-card>
           </div>
@@ -124,7 +115,6 @@ import {
   NSpace, 
   NPagination, 
   NConfigProvider,
-  NModal,
 } from 'naive-ui';
 import { Search } from '@vicons/ionicons5';
 import Header from '../../PublicComponents/Header.vue';
@@ -157,7 +147,6 @@ export default defineComponent({
     NSpace,
     NPagination,
     NConfigProvider,
-    NModal,
   },
   setup() {
     const assistantStore = useAssistantStore();
@@ -165,8 +154,6 @@ export default defineComponent({
     const router = useRouter();
     
     const searchQuery = ref('');
-    const showConfirmModal = ref(false);
-    const currentAssistant = ref(null);
     const isLoading = ref(false);
 
     const filteredAssistants = computed(() => {
@@ -174,15 +161,8 @@ export default defineComponent({
     });
 
     const addAssistant = (assistant) => {
-      currentAssistant.value = assistant;
-      showConfirmModal.value = true;
-    };
-
-    const confirmAddAssistant = () => {
-      if (currentAssistant.value) {
-        assistantStore.addAssistant(currentAssistant.value);
-        showConfirmModal.value = false;
-        currentAssistant.value = null;
+      if (confirm(`确定要添加助手 "${assistant.name}" 吗？`)) {
+        assistantStore.addAssistant(assistant);
       }
     };
 
@@ -196,11 +176,8 @@ export default defineComponent({
       themeOverrides,
       searchQuery,
       filteredAssistants,
-      showConfirmModal,
-      currentAssistant,
       isLoading,
       addAssistant,
-      confirmAddAssistant,
       viewAssistantDetails
     };
   }

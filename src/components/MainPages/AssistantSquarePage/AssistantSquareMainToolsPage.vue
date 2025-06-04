@@ -99,16 +99,7 @@
       </div>
     </div>
 
-    <n-modal
-      v-model:show="showConfirmModal"
-      preset="dialog"
-      title="确认添加工具"
-      positive-text="确认"
-      negative-text="取消"
-      @positive-click="confirmAddTool"
-    >
-      <p>确定要添加工具 "{{ currentTool?.name }}" 吗？</p>
-    </n-modal>
+
   </n-config-provider>
 </template>
 
@@ -125,7 +116,6 @@ import {
   NSpace, 
   NPagination, 
   NConfigProvider,
-  NModal,
 } from 'naive-ui';
 import { Search } from '@vicons/ionicons5';
 import Header from '../../PublicComponents/Header.vue';
@@ -158,7 +148,6 @@ export default defineComponent({
     NSpace,
     NPagination,
     NConfigProvider,
-    NModal,
   },
   setup() {
     const assistantStore = useAssistantStore();
@@ -176,8 +165,6 @@ export default defineComponent({
     const router = useRouter();
     
     const searchQuery = ref('');
-    const showConfirmModal = ref(false);
-    const currentTool = ref(null);
     const isLoading = ref(false);
 
     const filteredTools = computed(() => {
@@ -185,19 +172,12 @@ export default defineComponent({
     });
 
     const addTool = (tool) => {
-      currentTool.value = {
-        name: tool.name,
-        description: tool.description,
-        tags: tool.tags
-      };
-      showConfirmModal.value = true;
-    };
-
-    const confirmAddTool = () => {
-      if (currentTool.value) {
-        assistantStore.addAssistant(currentTool.value);
-        showConfirmModal.value = false;
-        currentTool.value = null;
+      if (confirm(`确定要添加工具 "${tool.name}" 吗？`)) {
+        assistantStore.addAssistant({
+          name: tool.name,
+          description: tool.description,
+          tags: tool.tags
+        });
       }
     };
 
@@ -211,11 +191,8 @@ export default defineComponent({
       themeOverrides,
       searchQuery,
       filteredTools,
-      showConfirmModal,
-      currentTool,
       isLoading,
       addTool,
-      confirmAddTool,
       viewToolDetails
     };
   }

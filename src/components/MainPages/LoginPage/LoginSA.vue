@@ -19,7 +19,13 @@ function handleLogin() {
     if (username.value && password.value) {
         authStore.loginSA(username.value, password.value, role.value);
         localStorage.setItem('isAuthenticated', 'true');
-        router.push('/home');
+        if (role.value === 'admin') {
+            router.push('/manager');
+        } else if (role.value === 'customer') {
+            router.push('/service');
+        } else {
+            console.log('未知角色');
+        }
     } else {
         alert('用户名和密码都必须填写');
     }

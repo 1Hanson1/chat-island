@@ -11,7 +11,7 @@ const errorMessage = ref('');
 
 const router = useRouter();
 const authStore = useAuthStore();
-const role = ref('NOMRAL');
+const role = ref('user');
 
 function handleLogin() {
     if (username.value && password.value) {

@@ -6,16 +6,17 @@ import router from '../router'
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(localStorage.getItem('isAuthenticated') === 'true')
   const user = ref(JSON.parse(localStorage.getItem('user')) || null)
+
   
   function changeIsAuthenticated(value) {
     isAuthenticated.value = value
   }
 
-  function login(username, password) {
+  function login(username, password, role) {
     isAuthenticated.value = true
-    user.value = { username, password }
+    user.value = { username, password, role }
     localStorage.setItem('isAuthenticated', 'true')
-    localStorage.setItem('user', JSON.stringify({ username, password }))
+    localStorage.setItem('user', JSON.stringify({ username, password, role }))
   }
 
   function loginSA(username, password, role) {
@@ -25,6 +26,13 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('user', JSON.stringify({ username, password, role }))
   }
   
+  function register(username, password, role) {
+    const userData = { username, password, role }
+    isAuthenticated.value = true
+    user.value = userData
+    localStorage.setItem('user', JSON.stringify(userData))
+  }
+
   function registerSA(username, password, role, serialNumber) {
     const userData = { username, password, role, serialNumber}
     isAuthenticated.value = true

@@ -9,6 +9,14 @@ export const useAssistantStore = defineStore('assistant', () => {
       description: '普通聊天助手',
       tags: ['聊天'],
       historys: [],
+      inputFormat: '',
+      outputFormat: '',
+      contextLength: 3,
+      presetPrompts: {
+        systemPrompt: '你是一个友好的AI助手',
+        contextExamples: [],
+        conversationStarters: ['你好', '最近怎么样?']
+      }
     },
     {
       id: 1,
@@ -16,6 +24,14 @@ export const useAssistantStore = defineStore('assistant', () => {
       description: '帮助撰写各类文章',
       tags: ['写作'],
       historys: [],
+      inputFormat: '',
+      outputFormat: '',
+      contextLength: 3,
+      presetPrompts: {
+        systemPrompt: '你是一个专业的写作助手',
+        contextExamples: [],
+        conversationStarters: ['帮我写一篇文章', '我需要写作帮助']
+      }
     },
     {
       id: 2,
@@ -23,6 +39,14 @@ export const useAssistantStore = defineStore('assistant', () => {
       description: '解答编程问题',
       tags: ['编程'],
       historys: [],
+      inputFormat: '',
+      outputFormat: '',
+      contextLength: 3,
+      presetPrompts: {
+        systemPrompt: '你是一个专业的编程助手',
+        contextExamples: [],
+        conversationStarters: ['帮我解决这个编程问题', '解释这段代码']
+      }
     },
   ])
   
@@ -50,7 +74,15 @@ export const useAssistantStore = defineStore('assistant', () => {
         name: assistant.name,
         description: assistant.description || '',
         tags: assistant.tags || [],
-        historys: []
+        historys: [],
+        inputFormat: assistant.inputFormat || '',
+        outputFormat: assistant.outputFormat || '',
+        contextLength: assistant.contextLength || 3,
+        presetPrompts: assistant.presetPrompts || {
+          systemPrompt: '',
+          contextExamples: [],
+          conversationStarters: []
+        }
       }
       assistants.value.push(newAssistant)
       return newAssistant

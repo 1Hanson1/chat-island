@@ -64,16 +64,7 @@
       </div>
     </div>
 
-    <n-modal
-      v-model:show="showConfirmModal"
-      preset="dialog"
-      title="确认添加工具"
-      positive-text="确认"
-      negative-text="取消"
-      @positive-click="confirmAddTool"
-    >
-      <p>确定要添加工具 "{{ tool.name }}" 吗？</p>
-    </n-modal>
+
   </n-config-provider>
 </template>
 
@@ -88,7 +79,6 @@ import {
   NSpace,
   NCard,
   NConfigProvider,
-  NModal,
 } from 'naive-ui';
 import Header from './Header.vue';
 import LeftSmallList from './LeftSmallList.vue';
@@ -115,7 +105,6 @@ export default defineComponent({
     NSpace,
     NCard,
     NConfigProvider,
-    NModal,
   },
   setup() {
     const route = useRoute();
@@ -126,7 +115,6 @@ export default defineComponent({
       tags: [],
       details: ''
     });
-    const showConfirmModal = ref(false);
     const isLoading = ref(true);
 
     onMounted(async () => {
@@ -145,21 +133,16 @@ export default defineComponent({
     });
 
     const addTool = () => {
-      showConfirmModal.value = true;
-    };
-
-    const confirmAddTool = () => {
-      assistantStore.addAssistant(tool.value);
-      showConfirmModal.value = false;
+      if (confirm(`确定要添加工具 "${tool.value.name}" 吗？`)) {
+        assistantStore.addAssistant(tool.value);
+      }
     };
 
     return {
       assistantStore,
       themeOverrides,
       tool,
-      showConfirmModal,
-      addTool,
-      confirmAddTool
+      addTool
     };
   }
 });

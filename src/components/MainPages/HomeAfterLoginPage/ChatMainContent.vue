@@ -59,8 +59,8 @@ function createNewChat() {
 }
 
 function setAssistant() {
-  if (currentAssistant.value) {
-    router.push(`/assistant/${currentAssistant.value.id}`)
+  if (currentAssistant.value && currentAssistant.value.id !== 0) {
+    router.push(`/settings/${currentAssistant.value.id}`)
   }
 }
 
@@ -70,6 +70,7 @@ function deleteAssistant() {
       deleteAssistantStore(currentAssistant.value.id)
     }
   }
+  
 }
 
 </script>

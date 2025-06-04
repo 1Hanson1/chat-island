@@ -8,7 +8,7 @@ const username = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const router = useRouter();
-const category = ref('NORMAL');
+const category = ref('user');
 
 async function handleRegister() {
     try{
