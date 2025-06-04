@@ -11,7 +11,7 @@ const authStore = useAuthStore();
 const role = ref('');
 
 const options = [
-    { label: '客服', value: 'customer' },
+    { label: '客服', value: 'service' },
     { label: '管理员', value: 'admin' }
 ]; // 定义角色选择选项
 
@@ -19,9 +19,10 @@ function handleLogin() {
     if (username.value && password.value) {
         authStore.loginSA(username.value, password.value, role.value);
         localStorage.setItem('isAuthenticated', 'true');
+        console.log(role.value);
         if (role.value === 'admin') {
             router.push('/manager');
-        } else if (role.value === 'customer') {
+        } else if (role.value === 'service') {
             router.push('/service');
         } else {
             console.log('未知角色');

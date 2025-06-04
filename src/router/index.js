@@ -74,7 +74,7 @@ router.beforeEach(async (to, from, next) => {
       // 根据用户角色重定向
       if (authStore.user.role === 'admin') {
         next('/manager')
-      } else if (authStore.user.role === 'service') {
+      } else if (authStore.user.role === 'customer') {
         next('/service')
       } else {
         next('/home')
