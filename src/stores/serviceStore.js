@@ -93,10 +93,16 @@ export const useServiceStore = defineStore('service', () => {
 
   function sendMessage(content) {
     if (!content) return
-    addMessage({
+    const message = {
       sender: 'me',
       content
-    })
+    }
+    addMessage(message)
+    
+    // 持久化消息到messagesData
+    if (currentUserId.value && messagesData[currentUserId.value]) {
+      messagesData[currentUserId.value].push(message)
+    }
   }
 
   return {
