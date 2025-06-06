@@ -1,14 +1,19 @@
 <script setup>
 import { ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
-import { NInput } from 'naive-ui';
+import { NInput, NSelect } from 'naive-ui';
 import { register } from '../../../api/user';
 
 const username = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const router = useRouter();
-const category = ref('user');
+const category = ref('');
+const selectOptions = [
+  { label: '普通用户', value: 'NORMAL' },
+  { label: '管理员', value: 'ADMIN' },
+  { label: '客服', value: 'CS' }
+];
 
 async function handleRegister() {
     try{
@@ -57,6 +62,15 @@ async function handleRegister() {
                     <label for="confirmPassword" class="block text-sm font-medium text-gray-700">确认密码</label>
                     <n-input v-model:value="confirmPassword" type="password" placeholder="再次输入密码" />
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">用户类型</label>
+                    <n-select
+                      v-model:value="category"
+                      :options="selectOptions"
+                      placeholder="请选择用户类型"
+                      clearable
+                    />
+                </div>
                 <br/>
                 <button
                     type="submit"
@@ -69,10 +83,6 @@ async function handleRegister() {
                     <router-link to="/login" class="text-blue-600 hover:underline">已有账号？去登录</router-link>
                 </div>
                 
-
-                <div>
-                    <router-link to="/register/SA" class="text-blue-600 hover:underline">客服/管理员注册入口</router-link>
-                </div>
             </form>
         </div>
     </div>

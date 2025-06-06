@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = 'http://106.15.28.195:8113/api';
+const baseURL = 'http://47.117.107.1645:8113/api';
 const instance = axios.create({
   baseURL,
 });
@@ -13,7 +13,19 @@ instance.interceptors.request.use(config => {
   }
   return config;
 });
-
+/**
+ * 
+ * @param {
+ * sessionId: string,
+ * msg: string,
+ * model: string,
+ * } param0 
+ * @returns {
+ * sessionId: string,
+ * msg: string,
+ * model: string,
+ * }
+ */
 export function streamChat({ sessionId, msg, model }) {
   return instance.post('/chat/stream-test', { sessionId, msg, model });
 }
