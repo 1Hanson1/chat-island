@@ -119,8 +119,8 @@ export function deleteUser(data) {
 
 /**
  * 升级为VIP
- * @param {
  * name: string,
+ * @param {
  * vipKey: string,
  * } data 
  * @returns {
@@ -133,16 +133,17 @@ export function deleteUser(data) {
  * }
  */
 export function upgradeVip(data) {
-  return instance.post('/user-quota/upgrade-vip',{
-    name: data.name,
+  var name = localStorage.getItem('user');
+  name = JSON.parse(name);
+  return instance.post(`/user-quota/upgrade-vip/?name=${name['username']}`,{
     vipKey: data.vipKey,
   });
 }
 
 /**
  * VIP续费
- * @param {
  * name: string,
+ * @param {
  * vipKey: string,
  * } data 
  * @returns {
@@ -153,8 +154,9 @@ export function upgradeVip(data) {
  * }
  */
 export function renewVip(data) {
-  return instance.post('/user-quota/renew-vip', {
-    name: data.name,
+  var name = localStorage.getItem('user');
+  name = JSON.parse(name);
+  return instance.post(`/user-quota/renew-vip/?name=${name['username']}`, {
     vipKey: data.vipKey,
   });
 }
@@ -171,5 +173,8 @@ export function renewVip(data) {
  * }
  */
 export function removeVip(payload) {
-  return instance.post('/user-quota/admin/vip-remove', payload);
+  return instance.post('/user-quota/admin/vip-remove', {
+    toRemover: payload.toRemover,
+    reason: payload.reason,
+  });
 }
