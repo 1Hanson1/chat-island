@@ -19,24 +19,10 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('user', JSON.stringify({ username, password, role }))
   }
 
-  function loginSA(username, password, role) {
-    isAuthenticated.value = true
-    user.value = { username, password, role }
-    localStorage.setItem('isAuthenticated', 'true')
-    localStorage.setItem('user', JSON.stringify({ username, password, role }))
-  }
   
   function register(username, password, role) {
-    const userData = { username, password, role }
     isAuthenticated.value = true
-    user.value = userData
-    localStorage.setItem('user', JSON.stringify(userData))
-  }
-
-  function registerSA(username, password, role, serialNumber) {
-    const userData = { username, password, role, serialNumber}
-    isAuthenticated.value = true
-    user.value = userData
+    user.value = { username, password, role }
     localStorage.setItem('user', JSON.stringify(userData))
   }
 
@@ -49,9 +35,8 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     changeIsAuthenticated,
     login,
-    loginSA,
+    register,
     logout,
-    registerSA
     }
 })
 

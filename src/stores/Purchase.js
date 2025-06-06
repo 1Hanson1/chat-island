@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { useHaveStore } from './HaveStore';
+import { upgradeVip } from '../api/user';
+import { useAuthStore } from './authStore';
 
 export const usePurchaseStore = defineStore('purchase', () => {
   const haveStore = useHaveStore();
@@ -43,7 +45,8 @@ export const usePurchaseStore = defineStore('purchase', () => {
     selectedModel.value = model;
   };
 
-  const handlePurchase = () => {
+  const handlePurchase = async () => {
+    const authStore = useAuthStore();
     if (activeTab.value === 'token') {
       const plan = tokenPlans.value[selectedTokenPlan.value];
       if (selectedModel.value === null) {
@@ -77,10 +80,10 @@ export const usePurchaseStore = defineStore('purchase', () => {
       console.log(`成功购买${plan.duration}时长套餐`);
     }
     
-    // 强制触发响应式更新（确保aiModels存在）
-    if (haveStore.aiModels && haveStore.aiModels.value) {
-      haveStore.aiModels.value = [...haveStore.aiModels.value];
-    }
+      // 强制触发响应式更新（确保aiModels存在）
+      if (haveStore.aiModels && haveStore.aiModels.value) {
+        haveStore.aiModels.value = [...haveStore.aiModels.value];
+      }
   };
 
   const calculateExpireDate = (additionalDays) => {

@@ -43,7 +43,7 @@ async function handleLogin() {
 
     localStorage.setItem('isAuthenticated', 'true');
     authStore.changeIsAuthenticated(true);
-    authStore.login(userInfoRes.data.userInfo.name, " ", userInfoRes.data.userInfo.category);
+    authStore.login(userInfoRes.data.userInfo.name, password.value, userInfoRes.data.userInfo.category);
 
     if(userInfoRes.data.userInfo.category === 'ADMIN'){
         router.push('/manager');

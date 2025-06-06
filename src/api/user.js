@@ -60,7 +60,8 @@ export function login(data) {
 /**
  * 获取用户信息
  * @param {
- * name: string,} data 
+ * name: string,
+ * } data 
  * @returns {
  * userinfo:{
  * uid: string,
@@ -132,7 +133,10 @@ export function deleteUser(data) {
  * }
  */
 export function upgradeVip(data) {
-  return instance.post('/user-quota/upgrade-vip', { vipKey: data.vipKey }, { params: { name: data.name } });
+  return instance.post('/user-quota/upgrade-vip',{
+    name: data.name,
+    vipKey: data.vipKey,
+  });
 }
 
 /**
@@ -149,7 +153,10 @@ export function upgradeVip(data) {
  * }
  */
 export function renewVip(data) {
-  return instance.post('/user-quota/renew-vip', { vipKey: data.vipKey }, { params: { name: data.name } });
+  return instance.post('/user-quota/renew-vip', {
+    name: data.name,
+    vipKey: data.vipKey,
+  });
 }
 
 /**
