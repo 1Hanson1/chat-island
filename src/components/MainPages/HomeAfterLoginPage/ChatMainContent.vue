@@ -8,10 +8,17 @@ import { Add } from '@vicons/ionicons5'
 import { IosSettings } from '@vicons/ionicons4'
 import { DeleteRound } from '@vicons/material'
 import { Icon } from '@vicons/utils'
+import { NSelect } from 'naive-ui'
 
 const router = useRouter()
-const assistantStore = useAssistantStore()
 const sourceGoDownStore = useSourceGoDownStore()
+const { knowledgeBases, selectedKnowledgeBaseId } = storeToRefs(sourceGoDownStore)
+const modelOptions = [
+  { label: 'GPT-3.5', value: 'gpt-3.5' },
+  { label: 'GPT-4', value: 'gpt-4' }
+]
+const selectedModel = ref('gpt-3.5')
+const assistantStore = useAssistantStore()
 const { currentAssistant, currentHistoryID } = storeToRefs(assistantStore)
 const { deleteAssistant: deleteAssistantStore } = assistantStore
 
@@ -108,6 +115,20 @@ function deleteAssistant() {
       </div>
     </div>
     
+    <div class="flex gap-4 p-4">
+      <n-select
+        v-model:value="selectedKnowledgeBaseId"
+        :options="knowledgeBases.map(kb => ({ label: kb.name, value: kb.kid }))"
+        placeholder="选择知识库"
+        class="flex-1"
+      />
+      <n-select
+        v-model:value="selectedModel"
+        :options="modelOptions"
+        placeholder="选择模型"
+        class="flex-1"
+      />
+    </div>
     <hr>
     <div v-if="currentAssistant" class="chat-content flex-1 overflow-y-auto mb-4 space-y-4 p-4">
       <div v-if="messages.length === 0" class="flex flex-col items-center justify-center h-full">

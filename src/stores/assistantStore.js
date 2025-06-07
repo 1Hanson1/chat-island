@@ -180,6 +180,7 @@ export const useAssistantStore = defineStore('assistant', () => {
     const assistant = assistants.value.find(a => a.id === assistantId)
     if (assistant) {
       // 仅处理助手的第一个历史记录
+      // 这个地方需要createhistory
       if (assistant.historys.length === 0) {
         const newHistory = {
           id: Date.now(), // 使用时间戳作为唯一ID
