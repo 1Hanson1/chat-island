@@ -15,7 +15,7 @@ export const useSourceGoDownStore = defineStore('sourceGoDown', () => {
   const knowledgeBases = ref([])
 
   // 当前选中的知识库ID
-  const selectedKnowledgeBaseId = ref('')
+  const selectedKnowledgeBaseId = ref('kb_1')
 
   // 获取知识库列表
   const fetchKnowledgeBases = async () => {

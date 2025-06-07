@@ -3,6 +3,7 @@ import { ref, watch, computed } from 'vue';
 import { storeToRefs } from 'pinia'
 import { useAssistantStore } from '../../../stores/assistantStore'
 import { useRouter } from 'vue-router'
+import { useSourceGoDownStore } from '../../../stores/sourceGoDown';
 import { Add } from '@vicons/ionicons5'
 import { IosSettings } from '@vicons/ionicons4'
 import { DeleteRound } from '@vicons/material'
@@ -10,6 +11,7 @@ import { Icon } from '@vicons/utils'
 
 const router = useRouter()
 const assistantStore = useAssistantStore()
+const sourceGoDownStore = useSourceGoDownStore()
 const { currentAssistant, currentHistoryID } = storeToRefs(assistantStore)
 const { deleteAssistant: deleteAssistantStore } = assistantStore
 
@@ -23,27 +25,21 @@ const messages = computed(() => {
 
 const newMessage = ref('') //输入框内容
 
-function sendMessage() {
+async function sendMessage() {
   if (!newMessage.value.trim()) return;
 
-  assistantStore.addHistory(
-    currentAssistant.value.id,
-    'user',
-    newMessage.value
-  );
-
-  let mid = newMessage.value;
+  const message = newMessage.value;
   newMessage.value = '';
-  
-  setTimeout(() => {
-    const aiResponse = '收到你的消息: ' + mid;
-    assistantStore.addHistory(
+  const kid = sourceGoDownStore.selectedKnowledgeBaseId
+  try {
+    await assistantStore.sendMessageToAPI(
       currentAssistant.value.id,
-      'ai',
-      aiResponse
+      message,
+      kid
     );
-  }, 500);
-  
+  } catch (err) {
+    console.error('发送消息失败:', err);
+  }
 }
 
 function createNewChat() {

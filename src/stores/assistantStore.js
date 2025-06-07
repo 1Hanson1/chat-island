@@ -1,7 +1,15 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { 
+  createSession,
+  chatWithKnowledge,
+  getSessionChat
+} from '../api/chatAi'
 
 export const useAssistantStore = defineStore('assistant', () => {
+  // API调用状态
+  const isLoading = ref(false)
+  const error = ref(null)
   const assistants = ref([
     {
       id: 0,
@@ -91,18 +99,80 @@ export const useAssistantStore = defineStore('assistant', () => {
   }
 
   // 创建历史记录
-  function createHistory(assistantId){
-    const assistant = assistants.value.find(a => a.id === assistantId)
-    if (assistant) {
+  async function createHistory(assistantId){
+    try {
+      const assistant = assistants.value.find(a => a.id === assistantId)
+      if (!assistant) return null
+      
+      // 调用API创建会话
+      const response = await createSession()
+      const sessionId = response.data.sessionId
+      
+      console.log('sessionId:', sessionId)
+
+      // 创建本地历史记录
       const newHistory = {
-        id: Date.now(), // 使用时间戳作为唯一ID
+        id: sessionId, // 使用API返回的sessionId
         title: '新会话',
         message: []
       }
       assistant.historys.unshift(newHistory)
       setCurrentHistory(newHistory.id) // 设置新创建的history为当前选中
+      
+      return newHistory
+    } catch (err) {
+      console.error('创建会话失败:', err)
+      throw err
     }
-    return null
+  }
+
+  // 发送消息到API
+  async function sendMessageToAPI(assistantId, message, kid) {
+    try {
+      isLoading.value = true
+      error.value = null
+      
+      // 1. 添加用户消息
+      addHistory(assistantId, 'user', message)
+      
+      console.log('sessionId:', currentHistoryID.value)
+      // 2. 调用API
+      const response = await chatWithKnowledge({
+        sessionId: currentHistoryID.value?.toString() || '000001',
+        msg: message,
+        kid,
+      })
+      
+      // 3. 处理流式响应
+      let aiResponse = ''
+      for await (const chunk of response.data) {
+        aiResponse += chunk
+        // 更新最后一条AI消息
+        updateLastAIMessage(assistantId, aiResponse)
+      }
+      
+      return aiResponse
+    } catch (err) {
+      error.value = err.message
+      addHistory(assistantId, 'ai', '抱歉，发送消息时出错: ' + err.message)
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+  
+  // 更新最后一条AI消息
+  function updateLastAIMessage(assistantId, content) {
+    const assistant = assistants.value.find(a => a.id === assistantId)
+    if (assistant) {
+      const currentHistory = assistant.historys.find(h => h.id === currentHistoryID.value)
+      if (currentHistory && currentHistory.message.length > 0) {
+        const lastMessage = currentHistory.message[currentHistory.message.length - 1]
+        if (lastMessage.talker === 'ai') {
+          lastMessage.content = content
+        }
+      }
+    }
   }
 
   // 添加历史记录
@@ -156,12 +226,15 @@ export const useAssistantStore = defineStore('assistant', () => {
     assistants,
     currentAssistant,
     currentHistoryID,
+    isLoading,
+    error,
     setCurrentHistory,
     setCurrentAssistant,
     hasAssistant,
     addAssistant,
     createHistory,
     addHistory,
+    sendMessageToAPI,
     deleteAssistant,
   }
 })

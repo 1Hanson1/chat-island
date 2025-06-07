@@ -38,9 +38,7 @@ export function chatWithKnowledge({
   kid, 
   model = "qwen-turbo" 
 }) {
-  return instance.post('/chat/say', { sessionId, msg, kid, model }, {
-    responseType: 'stream'
-  });
+  return instance.post('/chat/say', { sessionId, msg, kid, model });
 }
 
 // 4. 清理聊天记录
