@@ -40,11 +40,18 @@
                   :render-label="renderTreeLabel"
                   selectable
                   @update:selected-keys="handleKbSelect"
-                />
+                >
+                </n-tree>
               </div>
               <div class="flex-1 pl-5">
-                <div class="mb-4">
+                <div class="mb-4 flex gap-2">
                   <NButton type="primary" @click="showAddFileModal = true">上传文件</NButton>
+                  <NButton 
+                    type="error" 
+                    @click="handleRemoveKnowledgeBase(currentKnowledgeBase?.kid)"
+                  >
+                    删除知识库
+                  </NButton>
                 </div>
                 <n-modal v-model:show="showAddFileModal">
                   <NCard
@@ -89,10 +96,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, computed, h } from 'vue';
 import Header from '../../PublicComponents/Header.vue';
 import LeftSmallList from '../../PublicComponents/LeftSmallList.vue';
-import { ArchiveOutline as ArchiveIcon } from '@vicons/ionicons5'
+import { ArchiveOutline as ArchiveIcon, TrashOutline } from '@vicons/ionicons5'
 import { useSourceGoDownStore } from '../../../stores/sourceGoDown'
 import {
   NCard,
@@ -106,7 +113,7 @@ import {
   NModal,
   NUpload,
   NUploadDragger,
-  NConfigProvider
+  NConfigProvider,
 } from 'naive-ui';
 
 export default defineComponent({
@@ -126,7 +133,8 @@ export default defineComponent({
     NUpload,
     NUploadDragger,
     NConfigProvider,
-    ArchiveIcon
+    ArchiveIcon,
+    TrashOutline
   },
   setup() {
     const sourceGoDownStore = useSourceGoDownStore()
@@ -173,6 +181,18 @@ export default defineComponent({
       }
     }
 
+    const handleRemoveKnowledgeBase = (kid: string) => {
+      if (kid === 'kb1') {
+        console.log('不能删除默认知识库')
+        return
+      }
+      sourceGoDownStore.removeKnowledgeBase(kid)
+      if (sourceGoDownStore.selectedKnowledgeBaseId === kid) {
+        sourceGoDownStore.selectedKnowledgeBaseId = 'kb1'
+      }
+      console.log('知识库删除成功')
+    }
+
     const renderTreeLabel = ({ option }: { option: any }) => {
       return option.label;
     };
@@ -180,6 +200,27 @@ export default defineComponent({
     const fileColumns = [
       { title: '文件名', key: 'name' },
       { title: '文件类型', key: 'type' },
+      {
+        title: '操作',
+        key: 'actions',
+        render(row) {
+          return h(NButton, {
+            text: true,
+            type: 'error',
+            onClick: () => {
+              if (window.confirm('确定要删除这个文件吗？')) {
+                sourceGoDownStore.removeDocument(
+                  sourceGoDownStore.selectedKnowledgeBaseId,
+                  row.docid
+                );
+                console.log('文件删除成功');
+              }
+            }
+          }, {
+            default: () => h(NIcon, null, { default: () => h(TrashOutline) })
+          });
+        }
+      }
     ];
 
     const themeOverrides = {
@@ -198,6 +239,7 @@ export default defineComponent({
       showAddKbModal,
       showAddFileModal,
       fileColumns,
+      handleRemoveKnowledgeBase,
       handleKbSelect,
       handleAddKnowledgeBase,
       handleFileUpload,

@@ -78,6 +78,14 @@ export const usePurchaseStore = defineStore('purchase', () => {
       });
       
       console.log(`成功购买${plan.duration}时长套餐`);
+      
+      // 调用升级VIP接口
+      try {
+        await upgradeVip({ vipKey: '$$$$$$$$$$' });
+        console.log('VIP升级成功');
+      } catch (error) {
+        console.error('VIP升级失败:', error);
+      }
     }
     
       // 强制触发响应式更新（确保aiModels存在）

@@ -14,18 +14,27 @@ instance.interceptors.request.use(config => {
   return config;
 });
 
+/**
+ * 客户服务API
+ * 部分接口需要在请求头中携带Authorization字段，格式为Bearer <token>
+ */
+
+// 1. 用户提问接口
 export function submitHelpMessage({ uid, msg }) {
   return instance.post('/help/chat', { uid, msg });
 }
 
+// 2. 用户查询历史
 export function getUserInquiries(uid) {
   return instance.get('/help/inquiries', { params: { uid } });
 }
 
+// 3. 客服获取待处理消息
 export function getCustomerInquiries(uid) {
   return instance.get('/help/inquiries4cs', { params: { uid } });
 }
 
+// 4. 客服完成回复
 export function completeInquiry({ csUid, inquiryId, replyMsg }) {
-  return instance.post('/help/complete', { csUid, inquiryId, replyMsg });
+  return instance.post('/help/complete', { inquiryId, replyMsg }, { params: { csUid } });
 }
