@@ -43,6 +43,7 @@ async function handleLogin() {
     errorMessage.value = ''
 
     localStorage.setItem('isAuthenticated', 'true');
+    localStorage.setItem('uid', userInfoRes.data.userInfo.uid)
     authStore.changeIsAuthenticated(true);
     authStore.login(userInfoRes.data.userInfo.name, password.value, userInfoRes.data.userInfo.category);
 

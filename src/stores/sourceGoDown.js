@@ -1,22 +1,47 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { 
+  createKnowledge,
+  listKnowledge,
+  getKnowledgeInfo,
+  deleteKnowledge,
+  uploadDocument,
+  deleteDocument
+} from '../api/knowledge'
+import { create } from 'naive-ui'
 
 export const useSourceGoDownStore = defineStore('sourceGoDown', () => {
   // 知识库列表
-  const knowledgeBases = ref([
-    { 
-      kid: 'kb1',
-      name: '默认知识库',
-      description: '系统默认知识库',
-      documents: [
-        { docid: 'doc1', name: '示例文档.pdf', type: '文档' },
-        { docid: 'doc2', name: '示例图片.png', type: '图片' }
-      ]
-    }
-  ])
+  const knowledgeBases = ref([])
 
   // 当前选中的知识库ID
-  const selectedKnowledgeBaseId = ref('kb1')
+  const selectedKnowledgeBaseId = ref('')
+
+  // 获取知识库列表
+  const fetchKnowledgeBases = async () => {
+    try {
+      const uid = localStorage.getItem('uid')
+      const { data } = await listKnowledge({ uid })
+      
+      if (!data || !Array.isArray(data.data)) {
+        throw new Error('获取知识库数据格式错误')
+      }
+
+      knowledgeBases.value = data.data.map(kb => ({
+        kid: kb.kid || '',
+        name: kb.name || '未命名知识库',
+        description: kb.description || '',
+        documents: Array.isArray(kb.documents) ? kb.documents : []
+      }))
+      console.log('知识库列表:', knowledgeBases.value)
+      // 保留当前选中的知识库，如果没有则选择第一个
+      if (!selectedKnowledgeBaseId.value && knowledgeBases.value.length > 0) {
+        selectedKnowledgeBaseId.value = knowledgeBases.value[0].kid
+      }
+      // 数据已在前面更新，无需额外刷新
+    } catch (error) {
+    }
+  }
 
   // 获取当前选中的知识库
   const currentKnowledgeBase = computed(() => {
@@ -24,42 +49,80 @@ export const useSourceGoDownStore = defineStore('sourceGoDown', () => {
   })
 
   // 添加新知识库
-  const addKnowledgeBase = (name, description = '') => {
-    const newKid = `kb${Date.now()}`
-    knowledgeBases.value.push({
-      kid: newKid,
-      name,
-      description,
-      documents: []
-    })
-    return newKid
+  const addKnowledgeBase = async (name, description = '') => {
+    try {
+      const uid = localStorage.getItem('uid') // 假设用户ID存储在localStorage
+      const response = await createKnowledge({ name, description, uid })
+      const newKb = response.data
+      knowledgeBases.value.push({
+        kid: newKb.kid,
+        name: newKb.name,
+        description: newKb.description,
+        documents: []
+      })
+      return newKb.kid
+    } catch (error) {
+      console.error('创建知识库失败:', error)
+      throw error
+    }
   }
 
   // 删除知识库
-  const removeKnowledgeBase = (kid) => {
-    knowledgeBases.value = knowledgeBases.value.filter(kb => kb.kid !== kid)
+  const removeKnowledgeBase = async (kid) => {
+    try {
+      const uid = localStorage.getItem('uid')
+      await deleteKnowledge({ kid, uid })
+      
+      // 更新本地状态
+      knowledgeBases.value = knowledgeBases.value.filter(kb => kb.kid !== kid)
+      
+      // 如果删除的是当前选中的知识库，则重置选中状态
+      if (selectedKnowledgeBaseId.value === kid) {
+        selectedKnowledgeBaseId.value = knowledgeBases.value[0]?.kid || ''
+      }
+    } catch (error) {
+      console.error('删除知识库失败:', error)
+      throw error
+    }
   }
 
   // 添加文档到知识库
-  const addDocument = (kid, file) => {
-    const kbIndex = knowledgeBases.value.findIndex(kb => kb.kid === kid)
-    if (kbIndex !== -1) {
-      const newDocId = `doc${Date.now()}`
-      knowledgeBases.value[kbIndex].documents.push({
-        docid: newDocId,
-        name: file.name,
-        type: file.type || '未知'
-      })
-      return newDocId
+  const addDocument = async (kid, file) => {
+    try {
+      const uid = localStorage.getItem('uid')
+      const response = await uploadDocument({ kid, uid, file })
+      
+      // 更新本地状态
+      const kbIndex = knowledgeBases.value.findIndex(kb => kb.kid === kid)
+      if (kbIndex !== -1) {
+        const newDocument = {
+          docid: response.data.docId,
+          originalFilename: file.name,
+          fileType: file.type
+        }
+        knowledgeBases.value[kbIndex].documents.push(newDocument)
+      }
+      
+      return response.data
+    } catch (error) {
+      console.error('上传文档失败:', error)
+      throw error
     }
   }
 
   // 删除文档
-  const removeDocument = (kid, docid) => {
-    const kbIndex = knowledgeBases.value.findIndex(kb => kb.kid === kid)
-    if (kbIndex !== -1) {
-      knowledgeBases.value[kbIndex].documents = 
-        knowledgeBases.value[kbIndex].documents.filter(doc => doc.docid !== docid)
+  const removeDocument = async (kid, docid) => {
+    try {
+      await deleteDocument({ docId: docid })
+      
+      const kbIndex = knowledgeBases.value.findIndex(kb => kb.kid === kid)
+      if (kbIndex !== -1) {
+        knowledgeBases.value[kbIndex].documents = 
+          knowledgeBases.value[kbIndex].documents.filter(doc => doc.docid !== docid)
+      }
+    } catch (error) {
+      console.error('删除文档失败:', error)
+      throw error
     }
   }
 
@@ -70,6 +133,7 @@ export const useSourceGoDownStore = defineStore('sourceGoDown', () => {
     addKnowledgeBase,
     removeKnowledgeBase,
     addDocument,
-    removeDocument
+    removeDocument,
+    fetchKnowledgeBases
   }
 })

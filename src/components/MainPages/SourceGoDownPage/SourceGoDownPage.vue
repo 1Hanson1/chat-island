@@ -9,7 +9,7 @@
             <div class="h-full flex">
               <div class="w-64 pr-5 border-r border-gray-300">
                 <div class="mb-4">
-                  <NButton type="primary" @click="showAddKbModal = true">新建知识库</NButton>
+                  <NButton type="primary" @click="showAddKbModal = true" :loading="loading">新建知识库</NButton>
                 </div>
                 <n-modal v-model:show="showAddKbModal">
                   <NCard
@@ -31,7 +31,7 @@
                           type="textarea"
                         />
                       </n-form-item>
-                      <n-button type="primary" @click="handleAddKnowledgeBase">创建</n-button>
+                      <n-button type="primary" @click="handleAddKnowledgeBase" :loading="loading">创建</n-button>
                     </n-form>
                   </NCard>
                 </n-modal>
@@ -45,10 +45,11 @@
               </div>
               <div class="flex-1 pl-5">
                 <div class="mb-4 flex gap-2">
-                  <NButton type="primary" @click="showAddFileModal = true">上传文件</NButton>
+                  <NButton type="primary" @click="showAddFileModal = true" :loading="loading">上传文件</NButton>
                   <NButton 
                     type="error" 
                     @click="handleRemoveKnowledgeBase(currentKnowledgeBase?.kid)"
+                    :loading="loading"
                   >
                     删除知识库
                   </NButton>
@@ -96,7 +97,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, h } from 'vue';
+import { defineComponent, ref, computed, h, onMounted } from 'vue';
 import Header from '../../PublicComponents/Header.vue';
 import LeftSmallList from '../../PublicComponents/LeftSmallList.vue';
 import { ArchiveOutline as ArchiveIcon, TrashOutline } from '@vicons/ionicons5'
@@ -138,6 +139,19 @@ export default defineComponent({
   },
   setup() {
     const sourceGoDownStore = useSourceGoDownStore()
+    const loading = ref(false)
+
+    // 初始化数据
+    onMounted(async () => {
+      try {
+        loading.value = true
+        await sourceGoDownStore.fetchKnowledgeBases()
+      } catch (error) {
+        console.error('获取知识库列表失败:', error)
+      } finally {
+        loading.value = false
+      }
+    })
     
     const newKbName = ref('')
     const newKbDescription = ref('')
@@ -161,36 +175,62 @@ export default defineComponent({
       }
     }
 
-    const handleAddKnowledgeBase = () => {
-      if (newKbName.value.trim()) {
-        sourceGoDownStore.addKnowledgeBase(newKbName.value, newKbDescription.value)
+    const handleAddKnowledgeBase = async () => {
+      if (!newKbName.value.trim()) return
+      
+      try {
+        loading.value = true
+        await sourceGoDownStore.addKnowledgeBase(newKbName.value, newKbDescription.value)
+        console.log('添加知识库成功')
         newKbName.value = ''
         newKbDescription.value = ''
         showAddKbModal.value = false
+      } catch (error) {
+        console.error('创建知识库失败:', error)
+      } finally {
+        loading.value = false
       }
     }
 
-    const handleFileUpload = ({ fileList }: { fileList: File[] }) => {
-      if (sourceGoDownStore.selectedKnowledgeBaseId) {
-        fileList.forEach(file => {
-          sourceGoDownStore.addDocument(
-            sourceGoDownStore.selectedKnowledgeBaseId,
-            file
-          )
-        })
-      }
-    }
-
-    const handleRemoveKnowledgeBase = (kid: string) => {
-      if (kid === 'kb1') {
-        console.log('不能删除默认知识库')
+    const handleFileUpload = async ({ fileList }: { fileList: File[] }) => {
+      if (!fileList || fileList.length === 0) return
+      if (!sourceGoDownStore.selectedKnowledgeBaseId) {
+        console.log('请先选择知识库')
         return
       }
-      sourceGoDownStore.removeKnowledgeBase(kid)
-      if (sourceGoDownStore.selectedKnowledgeBaseId === kid) {
-        sourceGoDownStore.selectedKnowledgeBaseId = 'kb1'
+
+      try {
+        loading.value = true
+        for (const file of fileList) {
+          await sourceGoDownStore.addDocument(
+            sourceGoDownStore.selectedKnowledgeBaseId,
+            file.file
+          )
+        }
+        console.log('文件上传成功')
+        showAddFileModal.value = false
+      } catch (error) {
+        console.error('文件上传失败:', error)
+      } finally {
+        loading.value = false
       }
-      console.log('知识库删除成功')
+    }
+
+    const handleRemoveKnowledgeBase = async (kid: string) => {
+      if (kid === 'kb1') {
+        console.log('默认知识库不可删除')
+        return
+      }
+      
+      try {
+        loading.value = true
+        await sourceGoDownStore.removeKnowledgeBase(kid)
+        console.log('删除知识库成功')
+      } catch (error) {
+        console.error('删除知识库失败:', error)
+      } finally {
+        loading.value = false
+      }
     }
 
     const renderTreeLabel = ({ option }: { option: any }) => {
@@ -198,8 +238,8 @@ export default defineComponent({
     };
 
     const fileColumns = [
-      { title: '文件名', key: 'name' },
-      { title: '文件类型', key: 'type' },
+      { title: '文件名', key: 'originalFilename' },
+      { title: '文件类型', key: 'fileType' },
       {
         title: '操作',
         key: 'actions',
@@ -207,13 +247,21 @@ export default defineComponent({
           return h(NButton, {
             text: true,
             type: 'error',
-            onClick: () => {
-              if (window.confirm('确定要删除这个文件吗？')) {
-                sourceGoDownStore.removeDocument(
-                  sourceGoDownStore.selectedKnowledgeBaseId,
-                  row.docid
-                );
-                console.log('文件删除成功');
+            onClick: async () => {
+              try {
+                loading.value = true
+                if (confirm('确认删除该文件吗？')) {
+                  console.log('删除文件:', row.docId)
+                  await sourceGoDownStore.removeDocument(
+                    sourceGoDownStore.selectedKnowledgeBaseId,
+                    row.docId
+                  )
+                  console.log('文件删除成功')
+                }
+              } catch (error) {
+                console.error('文件删除失败:', error)
+              } finally {
+                loading.value = false
               }
             }
           }, {

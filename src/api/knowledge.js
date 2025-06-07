@@ -49,8 +49,11 @@ export function uploadDocument({ kid, uid, file }) {
   const formData = new FormData();
   formData.append('file', file);
   
-  return instance.post('/upload', formData, { 
-    params: { kid, uid },
+  return instance.post('/upload', formData, {
+    params: {
+      uid,
+      kid
+    },
     headers: {
       'Content-Type': 'multipart/form-data'
     }
