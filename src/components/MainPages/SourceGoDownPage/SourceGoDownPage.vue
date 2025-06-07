@@ -5,36 +5,51 @@
       <div class="flex-1 overflow-hidden flex">
         <LeftSmallList />
         <div class="flex-1 p-5 overflow-auto">
-          <NCard title="文件库" class="h-full">
+          <NCard title="知识库" class="h-full">
             <div class="h-full flex">
               <div class="w-64 pr-5 border-r border-gray-300">
-                <NTabs type="line">
-                  <NTabPane name="categories" tab="文件类型">
-                    <NTree
-                      :data="fileCategories"
-                      :render-label="renderTreeLabel"
-                      selectable
-                      @update:selected-keys="handleCategorySelect"
-                    />
-                  </NTabPane>
-                  <NTabPane name="groups" tab="文件分组">
-                    <NTree
-                      :data="fileGroups"
-                      :render-label="renderTreeLabel"
-                      selectable
-                      @update:selected-keys="handleGroupSelect"
-                    />
-                  </NTabPane>
-                </NTabs>
+                <div class="mb-4">
+                  <NButton type="primary" @click="showAddKbModal = true">新建知识库</NButton>
+                </div>
+                <n-modal v-model:show="showAddKbModal">
+                  <NCard
+                    style="width: 500px"
+                    title="新建知识库"
+                    :bordered="false"
+                    size="huge"
+                    role="dialog"
+                    aria-modal="true"
+                  >
+                    <n-form>
+                      <n-form-item label="知识库名称">
+                        <n-input v-model:value="newKbName" placeholder="请输入知识库名称" />
+                      </n-form-item>
+                      <n-form-item label="描述">
+                        <n-input 
+                          v-model:value="newKbDescription" 
+                          placeholder="请输入描述"
+                          type="textarea"
+                        />
+                      </n-form-item>
+                      <n-button type="primary" @click="handleAddKnowledgeBase">创建</n-button>
+                    </n-form>
+                  </NCard>
+                </n-modal>
+                <n-tree
+                  :data="knowledgeBaseTreeData"
+                  :render-label="renderTreeLabel"
+                  selectable
+                  @update:selected-keys="handleKbSelect"
+                />
               </div>
               <div class="flex-1 pl-5">
                 <div class="mb-4">
-                  <NButton type="primary" @click="showAddFileModal = true">添加文件</NButton>
+                  <NButton type="primary" @click="showAddFileModal = true">上传文件</NButton>
                 </div>
                 <n-modal v-model:show="showAddFileModal">
                   <NCard
                     style="width: 600px"
-                    title="添加新文件"
+                    title="上传文件"
                     :bordered="false"
                     size="huge"
                     role="dialog"
@@ -44,6 +59,7 @@
                       multiple
                       directory-dnd
                       :max="5"
+                      @change="handleFileUpload"
                     >
                       <n-upload-dragger>
                         <div style="margin-bottom: 12px">
@@ -58,10 +74,10 @@
                     </n-upload>
                   </NCard>
                 </n-modal>
-                <n-data-Table
+                <n-data-table
                   :columns="fileColumns"
-                  :data="filteredFiles"
-                  :row-key="row => row.id"
+                  :data="currentKnowledgeBase?.documents || []"
+                  :row-key="row => row.docid"
                 />
               </div>
             </div>
@@ -77,11 +93,10 @@ import { defineComponent, ref, computed } from 'vue';
 import Header from '../../PublicComponents/Header.vue';
 import LeftSmallList from '../../PublicComponents/LeftSmallList.vue';
 import { ArchiveOutline as ArchiveIcon } from '@vicons/ionicons5'
+import { useSourceGoDownStore } from '../../../stores/sourceGoDown'
 import {
   NCard,
   NTree,
-  NTabs,
-  NTabPane,
   NDataTable,
   NIcon,
   NForm,
@@ -89,21 +104,18 @@ import {
   NInput,
   NButton,
   NModal,
-  NSelect,
   NUpload,
   NUploadDragger,
   NConfigProvider
 } from 'naive-ui';
 
 export default defineComponent({
-  name: 'KnowledgeBasePage',
+  name: 'SourceGoDownPage',
   components: {
     Header,
     LeftSmallList,
     NCard,
     NTree,
-    NTabs,
-    NTabPane,
     NDataTable,
     NIcon,
     NForm,
@@ -111,66 +123,64 @@ export default defineComponent({
     NInput,
     NButton,
     NModal,
-    NSelect,
     NUpload,
     NUploadDragger,
     NConfigProvider,
     ArchiveIcon
   },
   setup() {
-    const fileCategories = ref([
-      { key: '文档', label: '文档' },
-      { key: '图片', label: '图片' },
-      { key: '视频', label: '视频' },
-      { key: '音频', label: '音频' }
-    ]);
+    const sourceGoDownStore = useSourceGoDownStore()
+    
+    const newKbName = ref('')
+    const newKbDescription = ref('')
+    const showAddKbModal = ref(false)
+    const showAddFileModal = ref(false)
 
-    const fileGroups = ref([
-      { key: '分组1', label: '分组1' },
-      { key: '分组2', label: '分组2' },
-      { key: '分组3', label: '分组3' }
-    ]);
+    const knowledgeBaseTreeData = computed(() => {
+      return sourceGoDownStore.knowledgeBases.map(kb => ({
+        key: kb.kid,
+        label: kb.name
+      }))
+    })
 
-    const files = ref([
-      { name: 'document.pdf', type: '文档', category: '文档', group: '分组1' },
-      { name: 'image.png', type: '图片', category: '图片', group: '分组2' },
-      { name: 'video.mp4', type: '视频', category: '视频', group: '分组1' },
-      { name: 'audio.mp3', type: '音频', category: '音频', group: '分组3' }
-    ]);
+    const currentKnowledgeBase = computed(() => {
+      return sourceGoDownStore.currentKnowledgeBase
+    })
 
-    const selectedCategory = ref<string[]>([]);
-    const selectedGroup = ref<string[]>([]);
+    const handleKbSelect = (keys: string[]) => {
+      if (keys.length > 0) {
+        sourceGoDownStore.selectedKnowledgeBaseId = keys[0]
+      }
+    }
 
-    const filteredFiles = computed(() => {
-      return files.value.filter(file => {
-        const categoryMatch = selectedCategory.value.length === 0 || 
-          selectedCategory.value.includes(file.category);
-        const groupMatch = selectedGroup.value.length === 0 || 
-          selectedGroup.value.includes(file.group);
-        return categoryMatch && groupMatch;
-      });
-    });
+    const handleAddKnowledgeBase = () => {
+      if (newKbName.value.trim()) {
+        sourceGoDownStore.addKnowledgeBase(newKbName.value, newKbDescription.value)
+        newKbName.value = ''
+        newKbDescription.value = ''
+        showAddKbModal.value = false
+      }
+    }
 
-
-    const fileColumns = [
-      { title: '文件名', key: 'name' },
-      { title: '文件类型', key: 'type' },
-      { title: '文件分组', key: 'group' },
-    ];
-
-    const handleCategorySelect = (keys: string[]) => {
-      selectedCategory.value = keys;
-    };
-
-    const handleGroupSelect = (keys: string[]) => {
-      selectedGroup.value = keys;
-    };
+    const handleFileUpload = ({ fileList }: { fileList: File[] }) => {
+      if (sourceGoDownStore.selectedKnowledgeBaseId) {
+        fileList.forEach(file => {
+          sourceGoDownStore.addDocument(
+            sourceGoDownStore.selectedKnowledgeBaseId,
+            file
+          )
+        })
+      }
+    }
 
     const renderTreeLabel = ({ option }: { option: any }) => {
       return option.label;
     };
-  
-    const showAddFileModal = ref(false);
+
+    const fileColumns = [
+      { title: '文件名', key: 'name' },
+      { title: '文件类型', key: 'type' },
+    ];
 
     const themeOverrides = {
       common: {
@@ -181,16 +191,17 @@ export default defineComponent({
     };
 
     return {
-      fileCategories,
-      fileGroups,
-      filteredFiles,
-      selectedCategory,
-      selectedGroup,
-      fileColumns,
-      handleCategorySelect,
-      handleGroupSelect,
-      renderTreeLabel,
+      knowledgeBaseTreeData,
+      currentKnowledgeBase,
+      newKbName,
+      newKbDescription,
+      showAddKbModal,
       showAddFileModal,
+      fileColumns,
+      handleKbSelect,
+      handleAddKnowledgeBase,
+      handleFileUpload,
+      renderTreeLabel,
       themeOverrides
     };
   }
