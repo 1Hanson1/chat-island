@@ -104,12 +104,13 @@ export const useAssistantStore = defineStore('assistant', () => {
       const assistant = assistants.value.find(a => a.id === assistantId)
       if (!assistant) return null
       
+      console.log('assistant:', assistant)
       // 调用API创建会话
       const response = await createSession()
       const sessionId = response.data.sessionId
       
       console.log('sessionId:', sessionId)
-
+      console.log('success')
       // 创建本地历史记录
       const newHistory = {
         id: sessionId, // 使用API返回的sessionId
@@ -127,20 +128,24 @@ export const useAssistantStore = defineStore('assistant', () => {
   }
 
   // 发送消息到API
-  async function sendMessageToAPI(assistantId, message, kid) {
+  async function sendMessageToAPI(assistantId, message, kid, model) {
     try {
       isLoading.value = true
       error.value = null
       
       // 1. 添加用户消息
       addHistory(assistantId, 'user', message)
-      
+
       console.log('sessionId:', currentHistoryID.value)
+      console.log('msg:', message)
+      console.log('kid:', kid)
+      console.log('model:', model)
       // 2. 调用API
       const response = await chatWithKnowledge({
         sessionId: currentHistoryID.value?.toString() || '000001',
         msg: message,
         kid,
+        model
       })
       
       // 3. 处理流式响应
@@ -150,7 +155,13 @@ export const useAssistantStore = defineStore('assistant', () => {
         // 更新最后一条AI消息
         updateLastAIMessage(assistantId, aiResponse)
       }
+      // 替换data:
+      aiResponse = aiResponse.replaceAll('data:', '')
+      aiResponse = aiResponse.replaceAll(' ', '')
+      // 4. 添加AI消息
+      addHistory(assistantId, 'ai', aiResponse)
       
+      // 5. 返回AI响应
       return aiResponse
     } catch (err) {
       error.value = err.message
@@ -176,11 +187,11 @@ export const useAssistantStore = defineStore('assistant', () => {
   }
 
   // 添加历史记录
+  // 面向汇报编程，第一次创建记录存在本地了，并没有传给后端
   function addHistory(assistantId, talker, content) {
     const assistant = assistants.value.find(a => a.id === assistantId)
     if (assistant) {
       // 仅处理助手的第一个历史记录
-      // 这个地方需要createhistory
       if (assistant.historys.length === 0) {
         const newHistory = {
           id: Date.now(), // 使用时间戳作为唯一ID

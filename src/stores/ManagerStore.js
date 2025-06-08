@@ -20,7 +20,6 @@ export const useManagerStore = defineStore('manager', () => {
       name: '客服1',
       conversations: [
         { id: 1, title: '与用户1的对话', content: '内容1' },
-        { id: 2, title: '与用户2的对话', content: '内容2' }
       ]
     }
   ])

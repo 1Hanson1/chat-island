@@ -15,9 +15,10 @@ const sourceGoDownStore = useSourceGoDownStore()
 const { knowledgeBases, selectedKnowledgeBaseId } = storeToRefs(sourceGoDownStore)
 const modelOptions = [
   { label: 'GPT-3.5', value: 'gpt-3.5' },
-  { label: 'GPT-4', value: 'gpt-4' }
+  { label: 'GPT-4', value: 'gpt-4' },
+  { label: 'qwen-turbo', value: 'qwen-turbo' }
 ]
-const selectedModel = ref('gpt-3.5')
+const selectedModel = ref('qwen-turbo')
 const assistantStore = useAssistantStore()
 const { currentAssistant, currentHistoryID } = storeToRefs(assistantStore)
 const { deleteAssistant: deleteAssistantStore } = assistantStore
@@ -42,7 +43,8 @@ async function sendMessage() {
     await assistantStore.sendMessageToAPI(
       currentAssistant.value.id,
       message,
-      kid
+      kid,
+      modelOptions.find(m => m.value === selectedModel.value).value
     );
   } catch (err) {
     console.error('发送消息失败:', err);

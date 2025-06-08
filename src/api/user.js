@@ -135,7 +135,8 @@ export function deleteUser(data) {
 export function upgradeVip(data) {
   var name = localStorage.getItem('user');
   name = JSON.parse(name);
-  return instance.post(`/user-quota/upgrade-vip/?name=${name['username']}`,{
+  return instance.post(`/user-quota/upgrade-vip`,{
+    name: data.name,
     vipKey: data.vipKey,
   });
 }
@@ -157,6 +158,7 @@ export function renewVip(data) {
   var name = localStorage.getItem('user');
   name = JSON.parse(name);
   return instance.post(`/user-quota/renew-vip/?name=${name['username']}`, {
+    name: data.name,
     vipKey: data.vipKey,
   });
 }
