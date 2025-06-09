@@ -6,7 +6,33 @@ import {
   getSessionChat
 } from '../api/chatAi'
 
+// 本地存储key
+const LOCAL_STORAGE_KEY = 'assistant-store'
+
 export const useAssistantStore = defineStore('assistant', () => {
+  // 从本地存储加载数据
+  function loadFromLocalStorage() {
+    try {
+      const savedData = localStorage.getItem(LOCAL_STORAGE_KEY)
+      if (savedData) {
+        const parsedData = JSON.parse(savedData)
+        if (Array.isArray(parsedData)) {
+          assistants.value = parsedData
+        }
+      }
+    } catch (err) {
+      console.error('加载本地存储数据失败:', err)
+    }
+  }
+
+  // 保存数据到本地存储
+  function saveToLocalStorage() {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(assistants.value))
+    } catch (err) {
+      console.error('保存数据到本地存储失败:', err)
+    }
+  }
   // API调用状态
   const isLoading = ref(false)
   const error = ref(null)
@@ -99,32 +125,21 @@ export const useAssistantStore = defineStore('assistant', () => {
   }
 
   // 创建历史记录
-  async function createHistory(assistantId){
-    try {
-      const assistant = assistants.value.find(a => a.id === assistantId)
-      if (!assistant) return null
-      
-      console.log('assistant:', assistant)
-      // 调用API创建会话
-      const response = await createSession()
-      const sessionId = response.data.sessionId
-      
-      console.log('sessionId:', sessionId)
-      console.log('success')
-      // 创建本地历史记录
-      const newHistory = {
-        id: sessionId, // 使用API返回的sessionId
-        title: '新会话',
-        message: []
-      }
-      assistant.historys.unshift(newHistory)
-      setCurrentHistory(newHistory.id) // 设置新创建的history为当前选中
-      
-      return newHistory
-    } catch (err) {
-      console.error('创建会话失败:', err)
-      throw err
+  function createHistory(assistantId){
+    const assistant = assistants.value.find(a => a.id === assistantId)
+    if (!assistant) return null
+    
+    // 创建本地历史记录
+    const newHistory = {
+      id: Date.now(), // 使用时间戳作为ID
+      title: '新会话',
+      message: []
     }
+    assistant.historys.unshift(newHistory)
+    setCurrentHistory(newHistory.id) // 设置新创建的history为当前选中
+    saveToLocalStorage() // 保存到本地存储
+    
+    return newHistory
   }
 
   // 发送消息到API
@@ -155,9 +170,9 @@ export const useAssistantStore = defineStore('assistant', () => {
         // 更新最后一条AI消息
         updateLastAIMessage(assistantId, aiResponse)
       }
-      // 替换data:
+      // 替换data:并去除所有空白字符
       aiResponse = aiResponse.replaceAll('data:', '')
-      aiResponse = aiResponse.replaceAll(' ', '')
+      aiResponse = aiResponse.replaceAll(/\s/g, '')
       // 4. 添加AI消息
       addHistory(assistantId, 'ai', aiResponse)
       
@@ -187,7 +202,6 @@ export const useAssistantStore = defineStore('assistant', () => {
   }
 
   // 添加历史记录
-  // 面向汇报编程，第一次创建记录存在本地了，并没有传给后端
   function addHistory(assistantId, talker, content) {
     const assistant = assistants.value.find(a => a.id === assistantId)
     if (assistant) {
@@ -215,6 +229,7 @@ export const useAssistantStore = defineStore('assistant', () => {
           })
         }
       }
+      saveToLocalStorage() // 保存到本地存储
     }
   }
 
@@ -248,5 +263,7 @@ export const useAssistantStore = defineStore('assistant', () => {
     addHistory,
     sendMessageToAPI,
     deleteAssistant,
+    saveToLocalStorage,
+    loadFromLocalStorage,
   }
 })

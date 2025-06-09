@@ -1,8 +1,13 @@
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import { storeToRefs } from 'pinia'
 import { useAssistantStore } from '../../../stores/assistantStore'
 import { useRouter } from 'vue-router'
+
+// 组件挂载时加载本地历史记录
+onMounted(() => {
+  assistantStore.loadFromLocalStorage()
+})
 import { useSourceGoDownStore } from '../../../stores/sourceGoDown';
 import { Add } from '@vicons/ionicons5'
 import { IosSettings } from '@vicons/ionicons4'
@@ -61,6 +66,7 @@ function createNewChat() {
       assistantStore.setCurrentHistory(currentAssistant.value.historys[0].id)
     }
   }
+  // assistantStore.createHistory(currentAssistant.value.id)
 }
 
 function setAssistant() {

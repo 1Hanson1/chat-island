@@ -58,7 +58,20 @@
     <!-- Main Content Area -->
     <n-layout-content>
       <div class="flex h-full">
-        <!-- 操作面板 -->
+        <!-- 内容显示区 -->
+        <n-card
+          title="对话内容"
+          class="flex-1 m-4"
+          content-style="min-height: calc(100vh - 32px);"
+        >
+          <div v-if="managerStore.currentConversation" class="p-4">
+            {{ managerStore.getCurrentConversationContent }}
+          </div>
+          <div v-else class="flex items-center justify-center h-full text-gray-400">
+            请选择对话查看内容
+          </div>
+        </n-card>
+        <!-- 操作面板区 -->
         <n-card title="操作面板" class="w-1/4 m-4" content-style="display: flex; flex-direction: column; gap-4;">
           <!-- 用户操作区 -->
           <n-card v-if="managerStore.currentSelection.type" :title="managerStore.currentSelection.type === 'user' ? '用户操作' : '客服操作'" size="small">
@@ -79,20 +92,6 @@
               <n-button type="error" block @click="managerStore.deleteConversation">删除记录</n-button>
             </n-space>
           </n-card>
-        </n-card>
-
-        <!-- 内容显示区 -->
-        <n-card
-          title="对话内容"
-          class="flex-1 m-4"
-          content-style="min-height: calc(100vh - 32px);"
-        >
-          <div v-if="managerStore.currentConversation" class="p-4">
-            {{ managerStore.getCurrentConversationContent }}
-          </div>
-          <div v-else class="flex items-center justify-center h-full text-gray-400">
-            请选择对话查看内容
-          </div>
         </n-card>
       </div>
     </n-layout-content>
