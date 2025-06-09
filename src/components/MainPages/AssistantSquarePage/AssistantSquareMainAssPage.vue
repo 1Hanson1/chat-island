@@ -104,7 +104,7 @@
 
 <script>  
 import { defineComponent, ref, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { 
   NCard, 
   NButton, 
@@ -150,7 +150,6 @@ export default defineComponent({
   },
   setup() {
     const assistantStore = useAssistantStore();
-    const route = useRoute();
     const router = useRouter();
     
     const searchQuery = ref('');
@@ -162,6 +161,7 @@ export default defineComponent({
 
     const addAssistant = (assistant) => {
       if (confirm(`确定要添加助手 "${assistant.name}" 吗？`)) {
+        console.log('add assistant', assistant);
         assistantStore.addAssistant(assistant);
       }
     };

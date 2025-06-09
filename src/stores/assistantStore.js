@@ -103,8 +103,8 @@ export const useAssistantStore = defineStore('assistant', () => {
   // 添加新助手
   function addAssistant(assistant) {
     if (!hasAssistant(assistant.name)) {
-      const newAssistant = {
-        id: Date.now(),
+        const newAssistant = {
+        id: assistant.id,
         name: assistant.name,
         description: assistant.description || '',
         tags: assistant.tags || [],
