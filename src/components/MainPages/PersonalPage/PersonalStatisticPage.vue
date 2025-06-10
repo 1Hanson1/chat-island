@@ -96,16 +96,16 @@ data() {
       { title: '总对话次数', key: 'totalConversations' }
     ],
     dailyData: [
-      { model: 'GPT-4', date: '2025-03-01', tokens: '12,345', conversations: 15 },
-      { model: 'DeepSeek', date: '2025-03-01', tokens: '8,765', conversations: 23 }
+      { model: 'GPT-4', date: '2025-03-01', tokens: '0', conversations: 0 },
+      { model: 'DeepSeek', date: '2025-03-01', tokens: '0', conversations: 0 }
     ],
     weeklyData: [
-      { model: 'GPT-4', week: '2025年第12周', tokens: '85,432', conversations: 98 },
-      { model: 'DeepSeek', week: '2025年第12周', tokens: '65,321', conversations: 145 }
+      { model: 'GPT-4', week: '2025年第12周', tokens: '0', conversations: 0 },
+      { model: 'DeepSeek', week: '2025年第12周', tokens: '0', conversations: 0 }
     ],
     totalData: [
-      { model: 'GPT-4', totalTokens: '1,234,567', totalConversations: 1234 },
-      { model: 'DeepSeek', totalTokens: '2,345,678', totalConversations: 2345 }
+      { model: 'GPT-4', totalTokens: '0', totalConversations: 0 },
+      { model: 'DeepSeek', totalTokens: '0', totalConversations: 0 }
     ]
   };
 }

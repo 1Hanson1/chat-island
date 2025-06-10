@@ -14,54 +14,54 @@ const router = useRouter();
 const authStore = useAuthStore();
 const role = ref('NORMAL');
 
-// function handleLogin() {
-//     if (username.value && password.value) {
-//         authStore.login(username.value, password.value, role.value);
-//         localStorage.setItem('isAuthenticated', 'true');
-//         router.push('/home');
-//     } else {
-//         alert('用户名和密码都必须填写');
-//     }
-// }
-
-async function handleLogin() {
-  try {
-    // 登录请求
-    const loginRes = await login({ 
-        name: username.value, 
-        password: password.value 
-    })
-    console.log('登录结果：', loginRes.data)
-    const token = loginRes.data.token
-    localStorage.setItem('token', token)
-
-    // 获取用户信息
-    const userInfoRes = await getUserInfo({
-        name: username.value,
-    })
-    console.log('用户信息：', userInfoRes.data.userInfo)
-    errorMessage.value = ''
-
-    localStorage.setItem('isAuthenticated', 'true');
-    localStorage.setItem('uid', userInfoRes.data.userInfo.uid)
-    authStore.changeIsAuthenticated(true);
-    authStore.login(userInfoRes.data.userInfo.name, password.value, userInfoRes.data.userInfo.category);
-
-    if(userInfoRes.data.userInfo.category === 'ADMIN'){
-        router.push('/manager');
-    }
-    else if(userInfoRes.data.userInfo.category === 'CS') {
-        router.push('/service')
-    }
-    else{
+function handleLogin() {
+    if (username.value && password.value) {
+        authStore.login(username.value, password.value, role.value);
+        localStorage.setItem('isAuthenticated', 'true');
         router.push('/home');
+    } else {
+        alert('用户名和密码都必须填写');
     }
-
-  } catch (err) {
-    console.error(err)
-    errorMessage.value = '登录失败，请检查用户名或密码'
-  }
 }
+
+// async function handleLogin() {
+//   try {
+//     // 登录请求
+//     const loginRes = await login({ 
+//         name: username.value, 
+//         password: password.value 
+//     })
+//     console.log('登录结果：', loginRes.data)
+//     const token = loginRes.data.token
+//     localStorage.setItem('token', token)
+
+//     // 获取用户信息
+//     const userInfoRes = await getUserInfo({
+//         name: username.value,
+//     })
+//     console.log('用户信息：', userInfoRes.data.userInfo)
+//     errorMessage.value = ''
+
+//     localStorage.setItem('isAuthenticated', 'true');
+//     localStorage.setItem('uid', userInfoRes.data.userInfo.uid)
+//     authStore.changeIsAuthenticated(true);
+//     authStore.login(userInfoRes.data.userInfo.name, password.value, userInfoRes.data.userInfo.category);
+
+//     if(userInfoRes.data.userInfo.category === 'ADMIN'){
+//         router.push('/manager');
+//     }
+//     else if(userInfoRes.data.userInfo.category === 'CS') {
+//         router.push('/service')
+//     }
+//     else{
+//         router.push('/home');
+//     }
+
+//   } catch (err) {
+//     console.error(err)
+//     errorMessage.value = '登录失败，请检查用户名或密码'
+//   }
+// }
 
 </script>
 

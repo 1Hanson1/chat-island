@@ -141,6 +141,10 @@ export default {
       }
     };
 
+    async function handlePurchase() {
+      await purchaseStore.handlePurchase();
+    }
+
     return {
       activeTab,
       selectedModel,
@@ -153,7 +157,7 @@ export default {
       setSelectedModel: purchaseStore.setSelectedModel,
       selectTokenPlan: purchaseStore.selectTokenPlan,
       selectDurationPlan: purchaseStore.selectDurationPlan,
-      handlePurchase: purchaseStore.handlePurchase,
+      handlePurchase,
       themeOverrides
     };
   }

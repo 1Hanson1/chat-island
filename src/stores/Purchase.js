@@ -2,7 +2,6 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { useHaveStore } from './HaveStore';
 import { upgradeVip } from '../api/user';
-import { useAuthStore } from './authStore';
 
 export const usePurchaseStore = defineStore('purchase', () => {
   const haveStore = useHaveStore();
@@ -46,7 +45,6 @@ export const usePurchaseStore = defineStore('purchase', () => {
   };
 
   const handlePurchase = async () => {
-    const authStore = useAuthStore();
     if (activeTab.value === 'token') {
       const plan = tokenPlans.value[selectedTokenPlan.value];
       if (selectedModel.value === null) {

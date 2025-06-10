@@ -92,7 +92,10 @@ export default defineComponent({
         key: 'usageRatio',
         align: 'center',
         render(row) {
-        const ratio = (row.usedTokens / row.totalTokens * 100).toFixed(1);
+          if (row.totalTokens === 0) {
+            return '100%';
+          }
+          const ratio = (row.usedTokens / row.totalTokens * 100).toFixed(1);
           return `${ratio}%`;
         }
       },

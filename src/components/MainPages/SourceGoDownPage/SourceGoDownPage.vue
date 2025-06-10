@@ -31,6 +31,9 @@
                           type="textarea"
                         />
                       </n-form-item>
+                      <n-form-item label="标签">
+                        <n-dynamic-tags v-model:value="newKbTags" />
+                      </n-form-item>
                       <n-button type="primary" @click="handleAddKnowledgeBase" :loading="loading">创建</n-button>
                     </n-form>
                   </NCard>
@@ -53,6 +56,25 @@
                   >
                     删除知识库
                   </NButton>
+                </div>
+                <div class="mb-4 p-4 bg-gray-100 rounded">
+                  <div class="mb-2">
+                    <span class="font-medium">描述：</span>
+                    <span>{{ currentKnowledgeBase?.description || '暂无描述' }}</span>
+                  </div>
+                  <div>
+                    <span class="font-medium">标签：</span>
+                    <n-space v-if="currentKnowledgeBase?.tags?.length > 0" size="small">
+                      <n-tag
+                        v-for="(tag, index) in currentKnowledgeBase?.tags"
+                        :key="index"
+                        type="info"
+                      >
+                        {{ tag }}
+                      </n-tag>
+                    </n-space>
+                    <span v-else>暂无标签</span>
+                  </div>
                 </div>
                 <n-modal v-model:show="showAddFileModal">
                   <NCard
@@ -115,6 +137,7 @@ import {
   NUpload,
   NUploadDragger,
   NConfigProvider,
+  NDynamicTags,
 } from 'naive-ui';
 
 export default defineComponent({
@@ -134,6 +157,7 @@ export default defineComponent({
     NUpload,
     NUploadDragger,
     NConfigProvider,
+    NDynamicTags,
     ArchiveIcon,
     TrashOutline
   },
@@ -155,6 +179,7 @@ export default defineComponent({
     
     const newKbName = ref('')
     const newKbDescription = ref('')
+    const newKbTags = ref([])
     const showAddKbModal = ref(false)
     const showAddFileModal = ref(false)
 
@@ -180,7 +205,7 @@ export default defineComponent({
       
       try {
         loading.value = true
-        await sourceGoDownStore.addKnowledgeBase(newKbName.value, newKbDescription.value)
+        await sourceGoDownStore.addKnowledgeBase(newKbName.value, newKbDescription.value, newKbTags.value)
         console.log('添加知识库成功')
         newKbName.value = ''
         newKbDescription.value = ''

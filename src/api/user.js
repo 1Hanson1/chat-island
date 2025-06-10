@@ -51,7 +51,7 @@ export function register(data) {
  * }
  */
 export function login(data) {
-  return instance.post(`${baseURL}/user/login`, {
+  return instance.post('/user/login', {
       name: data.name,
       password: data.password
     })
@@ -78,7 +78,7 @@ export function login(data) {
  * }
  */
 export function getUserInfo(data) {
-  return instance.get(`${baseURL}/user/info`, {
+  return instance.get('/user/info', {
     params: { name: data.name }
   });
 }
@@ -134,11 +134,18 @@ export function deleteUser(data) {
  */
 export function upgradeVip(data) {
   console.log(data.name);
-  return instance.post(`/user-quota/upgrade-vip`,{
-    name: data.name,
-    vipKey: data.vipKey,
-  });
+  return instance.post('/user-quota/upgrade-vip',
+    {
+      vipKey: data.vipKey,
+    },
+    {
+      params: {
+        name: data.name,
+      },
+    }
+  );
 }
+
 
 /**
  * VIP续费
@@ -154,12 +161,17 @@ export function upgradeVip(data) {
  * }
  */
 export function renewVip(data) {
-  return instance.post(`/user-quota/renew-vip/?name=${data.name}`, {
-    name: data.name,
-    vipKey: data.vipKey,
-  });
+  return instance.post('/user-quota/renew-vip', 
+    {
+      vipKey: data.vipKey,
+    },
+    {
+      params: {
+        name: data.name,
+      },
+    }
+  );
 }
-
 /**
  * 管理员强制降级用户VIP
  * @param {

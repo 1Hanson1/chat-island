@@ -23,10 +23,6 @@ export const useSourceGoDownStore = defineStore('sourceGoDown', () => {
       const uid = localStorage.getItem('uid')
       const { data } = await listKnowledge({ uid })
       
-      if (!data || !Array.isArray(data.data)) {
-        throw new Error('获取知识库数据格式错误')
-      }
-
       knowledgeBases.value = data.data.map(kb => ({
         kid: kb.kid || '',
         name: kb.name || '未命名知识库',
@@ -38,7 +34,6 @@ export const useSourceGoDownStore = defineStore('sourceGoDown', () => {
       if (!selectedKnowledgeBaseId.value && knowledgeBases.value.length > 0) {
         selectedKnowledgeBaseId.value = knowledgeBases.value[0].kid
       }
-      // 数据已在前面更新，无需额外刷新
     } catch (error) {
     }
   }
@@ -49,11 +44,12 @@ export const useSourceGoDownStore = defineStore('sourceGoDown', () => {
   })
 
   // 添加新知识库
-  const addKnowledgeBase = async (name, description = '') => {
+  const addKnowledgeBase = async (name, description = '', tags = []) => {
     try {
-      const uid = localStorage.getItem('uid') // 假设用户ID存储在localStorage
-      const response = await createKnowledge({ name, description, uid })
+      const uid = localStorage.getItem('uid') 
+      const response = await createKnowledge({ name, description, tags, uid })
       const newKb = response.data
+      console.log('创建知识库成功:', newKb)
       knowledgeBases.value.push({
         kid: newKb.kid,
         name: newKb.name,
