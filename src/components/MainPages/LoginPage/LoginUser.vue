@@ -12,13 +12,13 @@ const errorMessage = ref('');
 
 const router = useRouter();
 const authStore = useAuthStore();
-const role = ref('NORMAL');
+const role = ref('ADMIN');
 
 function handleLogin() {
     if (username.value && password.value) {
         authStore.login(username.value, password.value, role.value);
         localStorage.setItem('isAuthenticated', 'true');
-        router.push('/home');
+        router.push('/manager');
     } else {
         alert('用户名和密码都必须填写');
     }

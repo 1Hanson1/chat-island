@@ -1,11 +1,10 @@
 <template>
-  <n-layout has-sider class="h-screen">
+  <n-config-provider :theme-overrides="{ common: { primaryColor: '#1d4ed8' } }">
+  <div class="h-screen w-screen overflow-x-hidden flex bg-gray-50">
     <!-- Left Sider - Combined Selection and Conversations -->
-  <n-layout-sider
-    bordered
-    :width="280"
-    content-style="display: flex; flex-direction: column; padding-left: 16px;"
-  >
+    <aside
+      class="w-[280px] border-r border-gray-200 flex flex-col px-4 bg-white shadow-sm"
+    >
       <n-tabs type="line" animated class="mb-4">
         <n-tab-pane name="users" tab="用户">
           <n-list class="mb-4">
@@ -35,7 +34,7 @@
 
       <n-divider class="my-2" />
 
-      <n-card title="对话记录" content-style="padding: 0;">
+      <n-card title="对话记录" content-style="padding: 1;">
         <n-list>
           <n-list-item
             v-for="conversation in managerStore.getCurrentConversations"
@@ -53,10 +52,10 @@
           退出登录
         </n-button>
       </div>
-    </n-layout-sider>
+    </aside>
 
     <!-- Main Content Area -->
-    <n-layout-content>
+    <main class="flex-1 bg-white m-4 rounded-lg shadow-sm min-w-0">
       <div class="flex h-full">
         <!-- 内容显示区 -->
         <n-card
@@ -71,31 +70,37 @@
             请选择对话查看内容
           </div>
         </n-card>
-        <!-- 操作面板区 -->
-        <n-card title="操作面板" class="w-1/4 m-4" content-style="display: flex; flex-direction: column; gap-4;">
-          <!-- 用户操作区 -->
-          <n-card v-if="managerStore.currentSelection.type" :title="managerStore.currentSelection.type === 'user' ? '用户操作' : '客服操作'" size="small">
-            <n-space vertical>
-              <n-button type="primary" block @click="managerStore.editUser" >
-                编辑{{managerStore.currentSelection.type === 'user' ? '用户' : '客服'}}
-              </n-button>
-              <n-button type="error" block @click="managerStore.currentSelection.type === 'user' ? managerStore.deleteUser() : managerStore.deleteServiceAgent()" >
-                删除{{managerStore.currentSelection.type === 'user' ? '用户' : '客服'}}
-              </n-button>
-            </n-space>
-          </n-card>
-          
-          <!-- 聊天记录操作区 -->
-          <n-card v-if="managerStore.currentConversation" title="聊天记录操作" size="small">
-            <n-space vertical>
-              <n-button type="primary" block @click="managerStore.exportConversation">导出记录</n-button>
-              <n-button type="error" block @click="managerStore.deleteConversation">删除记录</n-button>
-            </n-space>
-          </n-card>
-        </n-card>
+      
       </div>
-    </n-layout-content>
-  </n-layout>
+    </main>
+    <aside
+      class="w-[280px] border-l border-gray-200 flex flex-col px-4 bg-white shadow-sm"
+    >
+      <!-- 操作面板区 -->
+      <n-card title="操作面板" class="mx-4 my-4 w-full" content-style="display: flex; flex-direction: column; gap-6; padding: 0 1rem;">
+        <!-- 用户操作区 -->
+        <n-card v-if="managerStore.currentSelection.type" :title="managerStore.currentSelection.type === 'user' ? '用户操作' : '客服操作'" size="small">
+          <n-space vertical size="large">
+            <n-button type="primary" block @click="managerStore.editUser" >
+              编辑{{managerStore.currentSelection.type === 'user' ? '用户' : '客服'}}
+            </n-button>
+            <n-button type="error" block @click="managerStore.currentSelection.type === 'user' ? managerStore.deleteUser() : managerStore.deleteServiceAgent()" >
+              删除{{managerStore.currentSelection.type === 'user' ? '用户' : '客服'}}
+            </n-button>
+          </n-space>
+        </n-card>
+        
+        <!-- 聊天记录操作区 -->
+        <n-card v-if="managerStore.currentConversation" title="聊天记录操作" size="small">
+          <n-space vertical>
+            <n-button type="primary" block @click="managerStore.exportConversation">导出记录</n-button>
+            <n-button type="error" block @click="managerStore.deleteConversation">删除记录</n-button>
+          </n-space>
+        </n-card>
+      </n-card>
+    </aside>
+  </div>
+  </n-config-provider>
 </template>
 
 <script setup>
@@ -103,9 +108,6 @@ import { useManagerStore } from '../../stores/ManagerStore'
 import { useAuthStore } from '../../stores/authStore'
 import { useRouter } from 'vue-router'
 import {
-  NLayout,
-  NLayoutSider,
-  NLayoutContent,
   NTabs,
   NTabPane,
   NList,
@@ -113,6 +115,7 @@ import {
   NThing,
   NCard,
   NButton,
+  NConfigProvider,
 } from 'naive-ui'
 
 const managerStore = useManagerStore()
@@ -126,7 +129,7 @@ const handleLogout = () => {
 </script>
 
 <style scoped>
-.n-layout-sider {
+aside {
   transition: all 0.3s ease;
 }
 
