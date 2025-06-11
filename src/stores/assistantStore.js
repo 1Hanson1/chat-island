@@ -230,7 +230,7 @@ async function createHistory(){
     }
   }
 
-  // 添加历史记录
+  // 添加历史记录（这个好像不用了）
   async function addHistory(assistantId, talker, content) {    
     if (historys.value.length === 0) {
       const newHistory = await createHistory()
