@@ -6,7 +6,8 @@ import { useRouter } from 'vue-router'
 
 // 组件挂载时加载本地历史记录
 onMounted(() => {
-  assistantStore.loadFromLocalStorage()
+  assistantStore.getAllSesseions()
+  assistantStore.createHistory(assistantStore.currentAssistant.id)
 })
 import { useSourceGoDownStore } from '../../../stores/sourceGoDown';
 import { Add } from '@vicons/ionicons5'
@@ -31,7 +32,7 @@ const { deleteAssistant: deleteAssistantStore } = assistantStore
 const messages = computed(() => {
   const currentAssistant = assistantStore.currentAssistant
   const currentHistory = currentAssistant?.historys.find(
-    h => h.id === assistantStore.currentHistoryID
+    h => h.sessionId === assistantStore.currentHistoryID
   )
   return currentHistory?.message || []
 })
@@ -56,14 +57,15 @@ async function sendMessage() {
   }
 }
 
-function createNewChat() {
+async function createNewChat() {
   const currentHistory = currentAssistant.value.historys[0]
+  console.log("前端调用",currentHistory)
   if (currentHistory) {
     if(currentHistory.message.length > 0) {
       assistantStore.createHistory(currentAssistant.value.id)
     }
     else{
-      assistantStore.setCurrentHistory(currentAssistant.value.historys[0].id)
+      assistantStore.setCurrentHistory(currentAssistant.value.historys[0].sessionId)
     }
   }
   // assistantStore.createHistory(currentAssistant.value.id)
@@ -141,7 +143,7 @@ function deleteAssistant() {
     <div v-if="currentAssistant" class="chat-content flex-1 overflow-y-auto mb-4 space-y-4 p-4">
       <div v-if="messages.length === 0" class="flex flex-col items-center justify-center h-full">
         <h2 class="text-2xl font-bold mb-4">欢迎使用{{ currentAssistant.name }}</h2>
-        <p class="text-gray-600">开始新的对话吧！(美化之后再说)</p>
+        <p class="text-gray-600">开始新的对话吧</p>
       </div>
       <div 
         v-else

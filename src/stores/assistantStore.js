@@ -3,36 +3,21 @@ import { ref } from 'vue'
 import { 
   createSession,
   chatWithKnowledge,
-  getSessionChat
+  deleteSession,
+  getUserSessions
 } from '../api/chatAi'
+import { create } from 'naive-ui'
 
-// 本地存储key
-const LOCAL_STORAGE_KEY = 'assistant-store'
+
 
 export const useAssistantStore = defineStore('assistant', () => {
-  // 从本地存储加载数据
-  function loadFromLocalStorage() {
-    try {
-      const savedData = localStorage.getItem(LOCAL_STORAGE_KEY)
-      if (savedData) {
-        const parsedData = JSON.parse(savedData)
-        if (Array.isArray(parsedData)) {
-          assistants.value = parsedData
-        }
-      }
-    } catch (err) {
-      console.error('加载本地存储数据失败:', err)
-    }
+
+  async function getAllSesseions() {
+    const uid = localStorage.getItem('uid')
+    const sessions = await getUserSessions(uid)
+    console.log(sessions.data)
   }
 
-  // 保存数据到本地存储
-  function saveToLocalStorage() {
-    try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(assistants.value))
-    } catch (err) {
-      console.error('保存数据到本地存储失败:', err)
-    }
-  }
   // API调用状态
   const isLoading = ref(false)
   const error = ref(null)
@@ -125,21 +110,27 @@ export const useAssistantStore = defineStore('assistant', () => {
   }
 
   // 创建历史记录
-  function createHistory(assistantId){
+async function createHistory(assistantId){
     const assistant = assistants.value.find(a => a.id === assistantId)
     if (!assistant) return null
-    
-    // 创建本地历史记录
-    const newHistory = {
-      id: Date.now(), // 使用时间戳作为ID
-      title: '新会话',
-      message: []
+    try{
+      const sessionId = await createSession()
+      console.log('创建成功sessionId:', sessionId.data)
+      if (!sessionId.data) return null
+
+      const newHistory = {
+        sessionId: sessionId.data,
+        title: '新会话',
+        message: []
+      }
+      assistant.historys.unshift(newHistory)
+      setCurrentHistory(newHistory.sessionId) // 设置新创建的history为当前选中
+      return newHistory
     }
-    assistant.historys.unshift(newHistory)
-    setCurrentHistory(newHistory.id) // 设置新创建的history为当前选中
-    saveToLocalStorage() // 保存到本地存储
-    
-    return newHistory
+    catch{
+      console.log('create session failed')
+      return null
+    }
   }
 
   // 发送消息到API
@@ -202,22 +193,18 @@ export const useAssistantStore = defineStore('assistant', () => {
   }
 
   // 添加历史记录
-  function addHistory(assistantId, talker, content) {
+  async function addHistory(assistantId, talker, content) {
     const assistant = assistants.value.find(a => a.id === assistantId)
     if (assistant) {
-      // 仅处理助手的第一个历史记录
       if (assistant.historys.length === 0) {
-        const newHistory = {
-          id: Date.now(), // 使用时间戳作为唯一ID
-          title: content.slice(0, 20) + (content.length > 20 ? '...' : ''),
-          message: [{id: 1, talker, content}]
-        }
-        assistant.historys.push(newHistory)
-        setCurrentHistory(newHistory.id) // 设置新创建的history为当前选中
+        console.log('create new history')
+        const newHistory = await createHistory(assistantId)
+        newHistory.message.push({id: 1, talker, content})
+        console.log("111",assistant.historys)
       } 
       else {
         // 找到当前选中的history记录
-        const currentHistory = assistant.historys.find(h => h.id === currentHistoryID.value)
+        const currentHistory = assistant.historys.find(h => h.sessionId === currentHistoryID.value)
         if (currentHistory.message.length === 0){
           currentHistory.title = content.slice(0, 20) + (content.length > 20 ? '...' : '')
         }
@@ -229,7 +216,6 @@ export const useAssistantStore = defineStore('assistant', () => {
           })
         }
       }
-      saveToLocalStorage() // 保存到本地存储
     }
   }
 
@@ -249,6 +235,15 @@ export const useAssistantStore = defineStore('assistant', () => {
     return false
   }
 
+  async function deleteSession(sessionId) {
+    try{
+      const response = await deleteSession(sessionId)
+      console.log(response.data)
+    }
+    catch{
+      console.log('delete session failed')
+    }
+  }
   return {
     assistants,
     currentAssistant,
@@ -263,7 +258,7 @@ export const useAssistantStore = defineStore('assistant', () => {
     addHistory,
     sendMessageToAPI,
     deleteAssistant,
-    saveToLocalStorage,
-    loadFromLocalStorage,
+    getAllSesseions,
+    deleteSession
   }
 })

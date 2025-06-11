@@ -7,11 +7,12 @@ const assistantStore = useAssistantStore()
 const { currentAssistant } = storeToRefs(assistantStore)
 
 function selectHistory(history) {
-  assistantStore.setCurrentHistory(history.id)
+  assistantStore.setCurrentHistory(history.sessionId)
 }
 
-function deleteHistory(historyId) {
-  const index = currentAssistant.value.historys.findIndex(h => h.id === historyId)
+async function deleteHistory(historyId) {
+  const index = currentAssistant.value.historys.findIndex(h => h.sessionId === historyId)
+  console.log( index )
     if (index !== -1) {
       currentAssistant.value.historys.splice(index, 1)
       // 如果删除的是当前选中的历史记录，重置选中状态
@@ -21,7 +22,7 @@ function deleteHistory(historyId) {
         }
         else{
           if(currentAssistant.value.historys[0].message.length === 0){
-            assistantStore.setCurrentHistory(currentAssistant.value.historys[1].id)
+            assistantStore.setCurrentHistory(currentAssistant.value.historys[1].sessionId)
           }
           else{
             assistantStore.createHistory(currentAssistant.value.id)
@@ -43,16 +44,16 @@ function deleteHistory(historyId) {
       <div v-if="currentAssistant" class="flex-1 overflow-y-auto">
         <div 
           v-for="history in currentAssistant.historys"
-          :key="history.id"
+          :key="history.sessionId"
           class="p-4 hover:bg-gray-200 cursor-pointer"
           @click="selectHistory(history)"
-          :class="{ 'bg-gray-200': history.id === assistantStore.currentHistoryID }"
+          :class="{ 'bg-gray-200': history.sessionId === assistantStore.currentHistoryID }"
         >
           <div class="flex items-center justify-between">
             <span class="list-content">{{ history.title }}</span>
             <button 
               class="text-red-500 hover:text-red-700 opacity-0 hover:opacity-100 transition-opacity duration-200"
-              @click.stop="deleteHistory(history.id)"
+              @click.stop="deleteHistory(history.sessionId)"
             >
               删除
             </button>
