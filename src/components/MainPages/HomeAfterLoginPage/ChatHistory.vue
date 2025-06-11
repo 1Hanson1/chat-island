@@ -11,21 +11,29 @@ function selectHistory(history) {
 }
 
 async function deleteHistory(historyId) {
-  const index = currentAssistant.value.historys.findIndex(h => h.sessionId === historyId)
+  const index = assistantStore.historys.value.findIndex(h => h.sessionId === historyId)
+  if(assistantStore.historys.value.length === 1){
+    console.log('不能删除最后一条历史记录')
+    return
+  }
+  if(assistantStore.historys.value[index].message.length === 0){
+    console.log('不能删除空的历史记录')
+    return
+  }
   console.log( index )
     if (index !== -1) {
-      currentAssistant.value.historys.splice(index, 1)
+      assistantStore.historys.value.splice(index, 1)
       // 如果删除的是当前选中的历史记录，重置选中状态
       if (assistantStore.currentHistoryID === historyId) {
-        if(currentAssistant.value.historys.length === 0){
-          assistantStore.createHistory(currentAssistant.value.id)
+        if(assistantStore.historys.value.length === 0){
+          assistantStore.createHistory()
         }
         else{
-          if(currentAssistant.value.historys[0].message.length === 0){
-            assistantStore.setCurrentHistory(currentAssistant.value.historys[1].sessionId)
+          if(assistantStore.historys.value[0].message.length === 0){
+            assistantStore.setCurrentHistory(assistantStore.historys.value[0].sessionId)
           }
           else{
-            assistantStore.createHistory(currentAssistant.value.id)
+            assistantStore.createHistory()
           }
         }
         
@@ -43,7 +51,7 @@ async function deleteHistory(historyId) {
     <n-scrollbar style="max-height: 740px" trigger="hover">
       <div v-if="currentAssistant" class="flex-1 overflow-y-auto">
         <div 
-          v-for="history in currentAssistant.historys"
+          v-for="history in assistantStore.historys"
           :key="history.sessionId"
           class="p-4 hover:bg-gray-200 cursor-pointer"
           @click="selectHistory(history)"

@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router'
 // 组件挂载时加载本地历史记录
 onMounted(() => {
   assistantStore.getAllSesseions()
-  assistantStore.createHistory(assistantStore.currentAssistant.id)
+  assistantStore.createHistory()
 })
 import { useSourceGoDownStore } from '../../../stores/sourceGoDown';
 import { Add } from '@vicons/ionicons5'
@@ -29,15 +29,30 @@ const assistantStore = useAssistantStore()
 const { currentAssistant, currentHistoryID } = storeToRefs(assistantStore)
 const { deleteAssistant: deleteAssistantStore } = assistantStore
 
-const messages = computed(() => {
-  const currentAssistant = assistantStore.currentAssistant
-  const currentHistory = currentAssistant?.historys.find(
-    h => h.sessionId === assistantStore.currentHistoryID
-  )
-  return currentHistory?.message || []
-})
-
+const messages = ref([])
 const newMessage = ref('') //输入框内容
+const isLoadingMessages = ref(false)
+
+async function loadMessages() {
+  try {
+    isLoadingMessages.value = true
+    if (currentHistoryID.value) {
+      messages.value = await assistantStore.getHistory(currentHistoryID.value) || []
+      console.log('加载历史消息成功:', messages.value)
+    }
+  } catch (err) {
+    console.error('加载消息失败:', err)
+    messages.value = []
+  } finally {
+    isLoadingMessages.value = false
+  }
+}
+
+// 监听currentHistoryID变化自动加载消息
+watch(currentHistoryID, loadMessages, { immediate: true })
+
+// 添加加载状态检查
+const showMessages = computed(() => !isLoadingMessages.value && messages.value)
 
 async function sendMessage() {
   if (!newMessage.value.trim()) return;
@@ -58,17 +73,15 @@ async function sendMessage() {
 }
 
 async function createNewChat() {
-  const currentHistory = currentAssistant.value.historys[0]
-  console.log("前端调用",currentHistory)
+  const currentHistory = assistantStore.historys[0]
   if (currentHistory) {
     if(currentHistory.message.length > 0) {
-      assistantStore.createHistory(currentAssistant.value.id)
+      assistantStore.createHistory()
     }
     else{
       assistantStore.setCurrentHistory(currentAssistant.value.historys[0].sessionId)
     }
   }
-  // assistantStore.createHistory(currentAssistant.value.id)
 }
 
 function setAssistant() {
@@ -141,28 +154,36 @@ function deleteAssistant() {
     </div>
     <hr>
     <div v-if="currentAssistant" class="chat-content flex-1 overflow-y-auto mb-4 space-y-4 p-4">
-      <div v-if="messages.length === 0" class="flex flex-col items-center justify-center h-full">
-        <h2 class="text-2xl font-bold mb-4">欢迎使用{{ currentAssistant.name }}</h2>
-        <p class="text-gray-600">开始新的对话吧</p>
-      </div>
-      <div 
-        v-else
-        v-for="(message, index) in messages" 
-        :key="index"
-        :class="{
-          'flex justify-end': message.talker === 'user',
-          'flex justify-start': message.talker === 'ai'
-        }"
-      >
+      <template v-if="isLoadingMessages">
+        <div class="flex justify-center items-center h-full">
+          <p>加载中...</p>
+        </div>
+      </template>
+      <template v-else-if="showMessages">
         <div 
+          v-for="(message, index) in messages" 
+          :key="index"
           :class="{
-            'bg-blue-500 text-white rounded-l-lg rounded-br-lg px-4 py-2 max-w-xs': message.talker === 'user',
-            'bg-gray-200 rounded-r-lg rounded-bl-lg px-4 py-2 max-w-xs': message.talker === 'ai'
+            'flex justify-end': message.talker === 'user',
+            'flex justify-start': message.talker === 'ai'
           }"
         >
-          {{ message.content }}
+          <div 
+            :class="{
+              'bg-blue-500 text-white rounded-l-lg rounded-br-lg px-4 py-2 max-w-xs': message.talker === 'user',
+              'bg-gray-200 rounded-r-lg rounded-bl-lg px-4 py-2 max-w-xs': message.talker === 'ai'
+            }"
+          >
+            {{ message.content }}
+          </div>
         </div>
-      </div>
+      </template>
+      <template v-else>
+        <div class="flex flex-col items-center justify-center h-full">
+          <h2 class="text-2xl font-bold mb-4">欢迎使用{{ currentAssistant.name }}</h2>
+          <p class="text-gray-600">开始新的对话吧</p>
+        </div>
+      </template>
     </div>
     <div v-else class="flex items-center justify-center h-full">
       <p>请从左侧选择助手</p>

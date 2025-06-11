@@ -9,14 +9,18 @@ const { assistants, currentAssistant } = storeToRefs(assistantStore)
 
 function selectAssistant(assistant) {
   assistantStore.setCurrentAssistant(assistant)
-  const currentHistory = assistant.historys[0]
+  const currentHistory = assistantStore.historys[0]
   if (currentHistory) {
     if(currentHistory.message.length > 0) {
       assistantStore.createHistory(assistant.id)
     }
     else {
-      assistantStore.setCurrentHistory(currentHistory.id)
+      console.log("set current history",currentHistory.sessionId)
+      assistantStore.setCurrentHistory(currentHistory.sessionId)
     }
+  }
+  else{
+    assistantStore.createHistory(assistant.id)
   }
 }
 
