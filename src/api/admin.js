@@ -1,7 +1,7 @@
 // adminApi.js
 import axios from 'axios';
 
-const baseURL = 'http://47.117.136.45:8113/api';
+const baseURL = 'http://47.117.136.45:8113/';
 const instance = axios.create({ baseURL });
 
 // 请求拦截器：自动附加 JWT token
