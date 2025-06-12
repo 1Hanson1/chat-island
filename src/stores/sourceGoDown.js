@@ -22,10 +22,11 @@ export const useSourceGoDownStore = defineStore('sourceGoDown', () => {
     try {
       const uid = localStorage.getItem('uid')
       const { data } = await listKnowledge({ uid })
-      
+      console.log('获取知识库列表成功:', data)
       knowledgeBases.value = data.data.map(kb => ({
         kid: kb.kid || '',
         name: kb.name || '未命名知识库',
+        tags: kb.tags || [],
         description: kb.description || '',
         documents: Array.isArray(kb.documents) ? kb.documents : []
       }))
@@ -53,6 +54,7 @@ export const useSourceGoDownStore = defineStore('sourceGoDown', () => {
       knowledgeBases.value.push({
         kid: newKb.kid,
         name: newKb.name,
+        tags: newKb.tags,
         description: newKb.description,
         documents: []
       })

@@ -3,12 +3,6 @@ import { ref, watch, computed, onMounted } from 'vue';
 import { storeToRefs } from 'pinia'
 import { useAssistantStore } from '../../../stores/assistantStore'
 import { useRouter } from 'vue-router'
-
-// 组件挂载时加载本地历史记录
-onMounted(() => {
-  assistantStore.getAllSesseions()
-  assistantStore.createHistory()
-})
 import { useSourceGoDownStore } from '../../../stores/sourceGoDown';
 import { Add } from '@vicons/ionicons5'
 import { IosSettings } from '@vicons/ionicons4'
@@ -26,12 +20,17 @@ const modelOptions = [
 ]
 const selectedModel = ref('qwen-turbo')
 const assistantStore = useAssistantStore()
-const { currentAssistant, currentHistoryID } = storeToRefs(assistantStore)
+const { flag, currentAssistant, currentHistoryID } = storeToRefs(assistantStore)
 const { deleteAssistant: deleteAssistantStore } = assistantStore
 
 const messages = ref([])
 const newMessage = ref('') //输入框内容
 const isLoadingMessages = ref(false)
+
+// 组件挂载时加载本地历史记录
+onMounted(() => {
+  assistantStore.getAllSesseions()
+})
 
 async function loadMessages() {
   try {
@@ -50,6 +49,7 @@ async function loadMessages() {
 
 // 监听currentHistoryID变化自动加载消息
 watch(currentHistoryID, loadMessages, { immediate: true })
+watch(flag, loadMessages, { immediate: true })
 
 // 添加加载状态检查
 const showMessages = computed(() => !isLoadingMessages.value && messages.value)
@@ -73,15 +73,7 @@ async function sendMessage() {
 }
 
 async function createNewChat() {
-  const currentHistory = assistantStore.historys[0]
-  if (currentHistory) {
-    if(currentHistory.message.length > 0) {
-      assistantStore.createHistory()
-    }
-    else{
-      assistantStore.setCurrentHistory(currentAssistant.value.historys[0].sessionId)
-    }
-  }
+  assistantStore.createHistory()
 }
 
 function setAssistant() {

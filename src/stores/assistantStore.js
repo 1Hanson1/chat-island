@@ -18,7 +18,7 @@ export const useAssistantStore = defineStore('assistant', () => {
     try {
       const uid = localStorage.getItem('uid')
       const sessions = await getUserSessions(uid)
-      console.log('sessions:', sessions)
+      console.log('sessions:', sessions.data)
       if (sessions?.data) {
         historys.value = sessions.data.map(session => ({
           sessionId: session.memoryId,
@@ -141,20 +141,21 @@ async function createHistory(){
     }
   }
 
+
+  const flag = ref(false)
   // 发送消息到API
   async function sendMessageToAPI(assistantId, message, kid, model) {
     try {
       isLoading.value = true
       error.value = null
       
-      // 1. 添加用户消息
-      addHistory(assistantId, 'user', message)
+      // addHistory(assistantId, 'user', message)
 
       console.log('sessionId:', currentHistoryID.value)
       console.log('msg:', message)
       console.log('kid:', kid)
       console.log('model:', model)
-      // 2. 调用API
+
       const response = await chatWithKnowledge({
         sessionId: currentHistoryID.value?.toString() || '000001',
         msg: message,
@@ -162,7 +163,6 @@ async function createHistory(){
         model
       })
       
-      // 3. 处理流式响应
       let aiResponse = ''
       for await (const chunk of response.data) {
         aiResponse += chunk
@@ -172,10 +172,16 @@ async function createHistory(){
       // 替换data:并去除所有空白字符
       aiResponse = aiResponse.replaceAll('data:', '')
       aiResponse = aiResponse.replaceAll(/\s/g, '')
-      // 4. 添加AI消息
-      addHistory(assistantId, 'ai', aiResponse)
+
+      // addHistory(assistantId, 'ai', aiResponse)
+      if(flag.value){
+        flag.value = false
+      }
+      else{
+        flag.value = true
+      }
+
       
-      // 5. 返回AI响应
       return aiResponse
     } catch (err) {
       error.value = err.message
@@ -206,6 +212,7 @@ async function createHistory(){
       const uid = localStorage.getItem('uid')
       const response = await getSessionChat({uid, sessionId})
       console.log('get session chat:', response.data)
+      console.log('get session', sessionId)
 
       if (response?.data) {
         return response.data.map(msg => {
@@ -268,16 +275,19 @@ async function createHistory(){
     return false
   }
 
-  async function deleteSession(sessionId) {
+  async function deleteSessionx(sessionId) {
     try{
+      console.log("delete session:", sessionId)
       const response = await deleteSession(sessionId)
-      console.log(response.data)
+      await getAllSesseions()
+      console.log("delete session response:", response.data)
     }
     catch{
       console.log('delete session failed')
     }
   }
   return {
+    flag,
     historys,
     assistants,
     currentAssistant,
@@ -294,6 +304,6 @@ async function createHistory(){
     sendMessageToAPI,
     deleteAssistant,
     getAllSesseions,
-    deleteSession
+    deleteSessionx
   }
 })

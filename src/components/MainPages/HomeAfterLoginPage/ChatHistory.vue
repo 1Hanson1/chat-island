@@ -7,39 +7,14 @@ const assistantStore = useAssistantStore()
 const { currentAssistant } = storeToRefs(assistantStore)
 
 function selectHistory(history) {
+  console.log('selectHistory:', history.sessionId)
   assistantStore.setCurrentHistory(history.sessionId)
 }
 
 async function deleteHistory(historyId) {
-  const index = assistantStore.historys.value.findIndex(h => h.sessionId === historyId)
-  if(assistantStore.historys.value.length === 1){
-    console.log('不能删除最后一条历史记录')
-    return
-  }
-  if(assistantStore.historys.value[index].message.length === 0){
-    console.log('不能删除空的历史记录')
-    return
-  }
-  console.log( index )
-    if (index !== -1) {
-      assistantStore.historys.value.splice(index, 1)
-      // 如果删除的是当前选中的历史记录，重置选中状态
-      if (assistantStore.currentHistoryID === historyId) {
-        if(assistantStore.historys.value.length === 0){
-          assistantStore.createHistory()
-        }
-        else{
-          if(assistantStore.historys.value[0].message.length === 0){
-            assistantStore.setCurrentHistory(assistantStore.historys.value[0].sessionId)
-          }
-          else{
-            assistantStore.createHistory()
-          }
-        }
-        
-      }
-    }
+  await assistantStore.deleteSessionx(historyId)
 }
+
 </script>
 
 <template>

@@ -209,6 +209,7 @@ export default defineComponent({
         console.log('添加知识库成功')
         newKbName.value = ''
         newKbDescription.value = ''
+        newKbTags.value = []
         showAddKbModal.value = false
       } catch (error) {
         console.error('创建知识库失败:', error)
