@@ -121,7 +121,7 @@ export function uploadUserDoc({ uid, kid, file }) {
 
 // 获取所有用户（支持按类别筛选）
 export function getAllUsers({ category = "NORMAL" }) {
-  return instance.get('/admin/user/users', { params: { category } });
+  return instance.get('/admin/user/get-all', { params: { category } });
 }
 
 // 通过用户名获取用户详情（含配额和VIP历史）

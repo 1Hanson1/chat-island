@@ -90,22 +90,38 @@
       <!-- 操作面板区 -->
       <n-card title="操作面板" class="mx-4 my-4 w-full" content-style="display: flex; flex-direction: column; gap-6; padding: 0 1rem;">
         <!-- 用户操作区 -->
-        <n-card v-if="managerStore.currentSelection.type" title="用户操作" size="small">
+        <n-card v-if="managerStore.currentSelection.type" title="用户管理" size="small">
           <n-space vertical size="large">
-            <n-button type="primary" block @click="managerStore.editUser" >
-              编辑用户
+            <n-button type="primary" block @click="managerStore.editUser">
+              编辑用户信息
             </n-button>
-            <n-button type="error" block @click="managerStore.deleteUser()" >
+            <n-button type="primary" block @click="managerStore.updateUserPassword">
+              修改密码
+            </n-button>
+            <n-button type="warning" block @click="managerStore.updateUserCategory">
+              变更用户类别
+            </n-button>
+            <n-button type="error" block @click="managerStore.deleteUser">
               删除用户
             </n-button>
           </n-space>
         </n-card>
         
         <!-- 聊天记录操作区 -->
-        <n-card v-if="managerStore.currentConversation" title="聊天记录操作" size="small">
+        <n-card v-if="managerStore.currentConversation" title="聊天记录管理" size="small">
           <n-space vertical>
             <n-button type="primary" block @click="managerStore.exportConversation">导出记录</n-button>
+            <n-button type="primary" block @click="managerStore.renameConversation">重命名</n-button>
             <n-button type="error" block @click="managerStore.deleteConversation">删除记录</n-button>
+            <n-button type="error" block @click="managerStore.clearEmptyConversations">清空空会话</n-button>
+          </n-space>
+        </n-card>
+        <n-card v-else-if="managerStore.currentKnowledgeBase" title="知识库管理" size="small">
+          <n-space vertical>
+            <n-button type="primary" block @click="managerStore.uploadKbDoc">上传文档</n-button>
+            <n-button type="primary" block @click="managerStore.createKb">新建知识库</n-button>
+            <n-button type="error" block @click="managerStore.deleteKbDoc">删除当前文档</n-button>
+            <n-button type="error" block @click="managerStore.deleteKb">删除当前知识库</n-button>
           </n-space>
         </n-card>
       </n-card>
@@ -128,10 +144,15 @@ import {
   NButton,
   NConfigProvider,
 } from 'naive-ui'
+import { onMounted } from 'vue'
 
 const managerStore = useManagerStore()
 const authStore = useAuthStore()
 const router = useRouter()
+
+onMounted(() => {
+  managerStore.getUsers()
+})
 
 const handleLogout = () => {
   authStore.logout()
