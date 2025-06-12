@@ -137,6 +137,7 @@ export function upgradeVip(data) {
   return instance.post('/user-quota/upgrade-vip',
     {
       vipKey: data.vipKey,
+      duration: data.duration,
     },
     {
       params: {
@@ -164,6 +165,7 @@ export function renewVip(data) {
   return instance.post('/user-quota/renew-vip', 
     {
       vipKey: data.vipKey,
+      duration: data.duration,
     },
     {
       params: {

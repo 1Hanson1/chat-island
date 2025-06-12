@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import { getUserInfo } from '../api/user'
 
 export const useHaveStore = defineStore('have', () => {
   // 是否有时长套餐
@@ -7,7 +8,7 @@ export const useHaveStore = defineStore('have', () => {
   
   // 时长套餐数据
   const durationData = ref({
-    name: '',
+    name: '时长套餐',
     remainingDays: 0,
     expireDate: ''
   });
@@ -30,7 +31,7 @@ export const useHaveStore = defineStore('have', () => {
       totalTokens: 0
     },
     {
-      model: 'Llama 2',
+      model: 'qwen-turbo',
       usedTokens: 0,
       totalTokens: 0
     }
@@ -53,24 +54,37 @@ export const useHaveStore = defineStore('have', () => {
     }
   };
 
-  // 购买时长套餐
-  const purchaseDuration = ({name, days, expireDate}) => {
-    if (!hasDuration.value) {
+  async function upgradeDuration() {
+    const username = JSON.parse(localStorage.getItem('user'))['username'];
+    const response_info = await getUserInfo({name:username});
+    console.log(response_info.data.userInfo);
+    const vipStartTime = response_info.data.userInfo.vipStartTime;
+    const vipEndTime = response_info.data.userInfo.vipEndTime;
+    console.log(vipStartTime, vipEndTime);
+    if(vipStartTime && vipEndTime) {
       hasDuration.value = true;
+      const endTime = new Date(vipEndTime).getTime();
+      const remainingDays = Math.ceil((endTime - Date.now()) / (24 * 60 * 60 * 1000));
+      durationData.value = {
+        name: '时长套餐',
+        remainingDays,
+        expireDate: new Date(vipEndTime).toLocaleDateString()
+      };
     }
-    durationData.value = {
-      name,
-      remainingDays: durationData.value.remainingDays + days,
-      expireDate
-    };
-  };
-
+    else{
+      durationData.value = {
+        name: '时长套餐',
+        remainingDays: 0,
+        expireDate: ''
+      }
+    }
+  }
   return {
     hasDuration,
     durationData,
     aiModels,
     purchaseTokens,
     useTokens,
-    purchaseDuration
+    upgradeDuration
   };
 });

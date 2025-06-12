@@ -59,7 +59,6 @@
 
 <script setup>
 import { ref, onMounted, h, onBeforeUnmount } from 'vue'
-import { debounce } from 'lodash-es'
 import { NConfigProvider, NInput, NButton, NIcon, NMenu } from 'naive-ui'
 import { Send as SendIcon } from '@vicons/ionicons5'
 import { submitHelpMessage, getUserInquiries } from '../../../api/CS.js'
@@ -82,9 +81,15 @@ const themeOverrides = {
 }
 
 // 消息数据
+const messagesHistory = ref([])
+
+// 中心
 const messages = ref([])
 const messageInput = ref('')
+
 const loading = ref(false)
+
+//边栏
 const conversations = ref([
   {
     label: '新对话',
@@ -112,14 +117,8 @@ const addNewConversation = () => {
 const fetchMessages = async () => {
     try {
       loading.value = true
-      const res = await getUserInquiries(localStorage.getItem('uid'))
-      console.log('获取历史消息成功:', res.data.data)
-      messages.value = res.data.data.map(item => ({
-        type: 'received',
-        content: "ssss",
-        time: new Date().toISOString()
-      }))
-      console.log('历史消息:', messages.value)
+      messagesHistory = await getUserInquiries(localStorage.getItem('uid'))
+      console.log('获取历史消息成功:', messagesHistory.data.data)
     } catch (error) {
       console.error('获取消息失败:', error)
       messages.value = []
@@ -135,17 +134,18 @@ const sendMessage = async () => {
   try {
     loading.value = true
     const uid = localStorage.getItem('uid')
+    
     const newMessage = {
       type: 'sent',
       content: messageInput.value,
       time: new Date().toISOString()
     }
-    
     messages.value.push(newMessage)
-    console.log(uid)
     console.log('发送消息:', messageInput.value)
+    
+    // 发送消息到服务器
     const res = await submitHelpMessage({ uid, msg: messageInput.value })
-    console.log('发送消息成功:', res.data)
+    console.log(res.data)
     messageInput.value = ''
     if (activeConversation.value === 'new') {
       addNewConversation()
@@ -157,27 +157,8 @@ const sendMessage = async () => {
   }
 }
 
-// 初始化获取消息
-const resizeObserver = ref(null)
-
 onMounted(() => {
   fetchMessages()
-  
-  // 添加防抖的ResizeObserver
-  resizeObserver.value = new ResizeObserver(debounce(() => {
-    // 空回调，仅用于消除警告
-  }, 100))
-  
-  const messageList = document.querySelector('.message-list-container')
-  if (messageList) {
-    resizeObserver.value.observe(messageList)
-  }
-})
-
-onBeforeUnmount(() => {
-  if (resizeObserver.value) {
-    resizeObserver.value.disconnect()
-  }
 })
 </script>
 

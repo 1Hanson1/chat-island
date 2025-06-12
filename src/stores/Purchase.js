@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { useHaveStore } from './HaveStore';
-import { upgradeVip } from '../api/user';
+import { upgradeVip,renewVip } from '../api/user';
 
 export const usePurchaseStore = defineStore('purchase', () => {
   const haveStore = useHaveStore();
@@ -27,7 +27,7 @@ export const usePurchaseStore = defineStore('purchase', () => {
     { label: 'GPT-4', value: 'GPT-4' },
     { label: 'Claude 2', value: 'Claude 2' },
     { label: 'DeepSeek', value: 'DeepSeek' },
-    { label: 'Llama 2', value: 'Llama 2' }
+    { label: 'qwen-turbo', value: 'qwen-turbo' }
   ];
 
   const selectTokenPlan = (index) => {
@@ -64,38 +64,30 @@ export const usePurchaseStore = defineStore('purchase', () => {
       const days = parseInt(plan.duration);
       
       // 首次购买时长套餐时设置hasDuration为true
-      if (!haveStore.hasDuration) {
-        haveStore.hasDuration = true;
+      try{
+        if(haveStore.hasDuration){
+          const response = await renewVip({ name: JSON.parse(localStorage.getItem('user'))['username'], vipKey: '$$$$$$$$$$', duration: days });
+          console.log(response);
+          console.log('VIP续费成功');
+        }
+        else{
+          const response = await upgradeVip({ name: JSON.parse(localStorage.getItem('user'))['username'], vipKey: '$$$$$$$$$$', duration: days });
+          console.log(response);
+          console.log('VIP升级成功');
+        }
+        console.log(`成功购买${plan.duration}时长套餐`);
+        haveStore.upgradeDuration();
+      }
+      catch(error){
+        console.log(error);
+        console.log('购买失败');
       }
       
-      // 使用store方法更新时长信息
-      haveStore.purchaseDuration({
-        name: plan.name,
-        days: days,
-        expireDate: calculateExpireDate(days)
-      });
-      
-      console.log(`成功购买${plan.duration}时长套餐`);
-      // 调用升级VIP接口
-      try {
-        const response = await upgradeVip({ name: JSON.parse(localStorage.getItem('user'))['username'], vipKey: '$$$$$$$$$$' });
-        console.log(response);
-        console.log('VIP升级成功');
-      } catch (error) {
-        console.error('VIP升级失败:', error);
-      }
     }
-    
       // 强制触发响应式更新（确保aiModels存在）
       if (haveStore.aiModels && haveStore.aiModels.value) {
         haveStore.aiModels.value = [...haveStore.aiModels.value];
       }
-  };
-
-  const calculateExpireDate = (additionalDays) => {
-    const date = new Date();
-    date.setDate(date.getDate() + haveStore.durationData.remainingDays + additionalDays);
-    return date.toISOString().split('T')[0];
   };
 
   return {

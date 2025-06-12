@@ -58,6 +58,7 @@ import { defineComponent, computed } from 'vue';
 import { NConfigProvider } from 'naive-ui';
 import router from '../../../router';
 import { useHaveStore } from '../../../stores/HaveStore';
+import { onMounted } from 'vue';
 
 export default defineComponent({
   components: { 
@@ -72,6 +73,9 @@ export default defineComponent({
   setup() {
     const haveStore = useHaveStore();
 
+    onMounted(() => {
+      haveStore.upgradeDuration();
+    });
     // 表格列定义
     const columns = [
       {

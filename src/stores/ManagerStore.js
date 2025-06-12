@@ -1,5 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { 
+  getChatSessions,
+  getChatSessionDetail,
+  // 这里添加其他API导入
+ } from '../api/admin'
 
 export const useManagerStore = defineStore('manager', () => {
   // 状态
@@ -10,33 +15,30 @@ export const useManagerStore = defineStore('manager', () => {
       conversations: [
         { id: 1, title: '与模型1的对话', content: '内容1' },
         { id: 2, title: '与模型2的对话', content: '内容2' }
+      ],
+      knowledgeBases: [
+        { id: 1, title: '产品文档', content: '文档内容1' },
+        { id: 2, title: '使用指南', content: '文档内容2' }
       ]
     }
   ])
 
-  const serviceAgents = ref([
-    {
-      id: 1,
-      name: '客服1',
-      conversations: [
-        { id: 1, title: '与用户1的对话', content: '内容1' },
-      ]
-    }
-  ])
+  // API数据状态
+  const apiData = ref(null)
+  
+  // 当前选中的知识库
+  const currentKnowledgeBase = ref(null)
 
   const currentSelection = ref({
-    type: null, // 'user' or 'serviceAgent'
+    type: null, // 'user'
     id: null
   })
 
   const currentConversation = ref(null)
 
-  // 计算属性
   const getCurrentConversations = computed(() => {
     if (!currentSelection.value.type) return []
-    return currentSelection.value.type === 'user'
-      ? users.value.find(u => u.id === currentSelection.value.id)?.conversations || []
-      : serviceAgents.value.find(s => s.id === currentSelection.value.id)?.conversations || []
+    return users.value.find(u => u.id === currentSelection.value.id)?.conversations || []
   })
 
   const getCurrentConversationContent = computed(() => {
@@ -44,15 +46,29 @@ export const useManagerStore = defineStore('manager', () => {
     return getCurrentConversations.value.find(c => c.id === currentConversation.value)?.content || ''
   })
 
-  // 方法
+  const getCurrentKnowledgeBases = computed(() => {
+    if (!currentSelection.value.type) return []
+    return users.value.find(u => u.id === currentSelection.value.id)?.knowledgeBases || []
+  })
+  
+  //操作方法
+
+  //选择当前用户
   function setCurrentSelection(type, id) {
     currentSelection.value = { type, id }
     currentConversation.value = null
   }
-
+  //选择当前对话
   function setCurrentConversation(id) {
     currentConversation.value = id
   }
+
+  // 设置当前知识库
+  function setCurrentKnowledgeBase(id) {
+    currentKnowledgeBase.value = id
+  }
+
+
 
   function editUser() {
     if (currentSelection.value.type === 'user') {
@@ -69,13 +85,6 @@ export const useManagerStore = defineStore('manager', () => {
     }
   }
 
-  function deleteServiceAgent() {
-    if (currentSelection.value.type === 'serviceAgent') {
-      serviceAgents.value = serviceAgents.value.filter(s => s.id !== currentSelection.value.id)
-      currentSelection.value = { type: null, id: null }
-    }
-  }
-
   function exportConversation() {
     if (currentConversation.value) {
       const conversation = getCurrentConversations.value.find(c => c.id === currentConversation.value)
@@ -85,31 +94,30 @@ export const useManagerStore = defineStore('manager', () => {
   }
 
   function deleteConversation() {
-    if (currentConversation.value) {
-      if (currentSelection.value.type === 'user') {
-        const user = users.value.find(u => u.id === currentSelection.value.id)
-        user.conversations = user.conversations.filter(c => c.id !== currentConversation.value)
-      } else {
-        const agent = serviceAgents.value.find(s => s.id === currentSelection.value.id)
-        agent.conversations = agent.conversations.filter(c => c.id !== currentConversation.value)
-      }
+    if (currentConversation.value && currentSelection.value.type === 'user') {
+      const user = users.value.find(u => u.id === currentSelection.value.id)
+      user.conversations = user.conversations.filter(c => c.id !== currentConversation.value)
       currentConversation.value = null
     }
   }
 
+
+
   return {
     users,
-    serviceAgents,
+    apiData,
     currentSelection,
     currentConversation,
+    currentKnowledgeBase,
     getCurrentConversations,
     getCurrentConversationContent,
+    getCurrentKnowledgeBases,
     setCurrentSelection,
     setCurrentConversation,
+    setCurrentKnowledgeBase,
     editUser,
     deleteUser,
-    deleteServiceAgent,
     exportConversation,
-    deleteConversation
+    deleteConversation,
   }
 })

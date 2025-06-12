@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { getCustomerInquiries, completeInquiry } from '../api/CS'
 
 export const useServiceStore = defineStore('service', () => {
   // 加载状态
@@ -7,12 +8,28 @@ export const useServiceStore = defineStore('service', () => {
   const error = ref(null)
 
   // 状态
-  const userList = ref([])
+  const userList = ref([
+    { id: 1, name: '用户1', lastMessage: '你好，我有问题咨询' },
+    { id: 2, name: '用户2', lastMessage: '订单查询' }
+  ])
+  const currentUserId = ref(1)
   
-  const currentUserId = ref(null)
   const messages = ref([])
   
-  const quickReplies = ref([])
+  const quickReplies = ref([
+    {
+      category: '问候语',
+      replies: ['您好，请问有什么可以帮您？', '很高兴为您服务']
+    },
+    {
+      category: '常见问题',
+      replies: [
+        '请提供您的订单号',
+        '我们会尽快处理您的问题',
+        '预计24小时内给您回复'
+      ]
+    }
+  ])
 
   // 初始消息数据
   const messagesData = {
@@ -30,29 +47,11 @@ export const useServiceStore = defineStore('service', () => {
   async function initData() {
     try {
       isLoading.value = true
-      // 模拟异步数据加载
-      await new Promise(resolve => setTimeout(resolve, 500))
       
-      userList.value = [
-        { id: 1, name: '用户1', lastMessage: '你好，我有问题咨询' },
-        { id: 2, name: '用户2', lastMessage: '订单查询' }
-      ]
-      currentUserId.value = 1
-      messages.value = [...messagesData[1]]
-      quickReplies.value = [
-        {
-          category: '问候语',
-          replies: ['您好，请问有什么可以帮您？', '很高兴为您服务']
-        },
-        {
-          category: '常见问题',
-          replies: [
-            '请提供您的订单号',
-            '我们会尽快处理您的问题',
-            '预计24小时内给您回复'
-          ]
-        }
-      ]
+      const uid = localStorage.getItem('uid')
+      const response = await getCustomerInquiries(uid)
+
+      console.log(response.data)
     } catch (err) {
       error.value = err
     } finally {
@@ -60,50 +59,7 @@ export const useServiceStore = defineStore('service', () => {
     }
   }
 
-  // 计算属性
-  const currentUser = computed(() => {
-    if (!currentUserId.value) return null
-    return userList.value.find(user => user.id === currentUserId.value)
-  })
-
-  // 方法
-  async function fetchUserMessages(userId) {
-    try {
-      isLoading.value = true
-      // 模拟异步加载用户消息
-      await new Promise(resolve => setTimeout(resolve, 300))
-      
-      // 返回预定义的消息数据
-      return [...messagesData[userId] || []]
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  async function setCurrentUser(id) {
-    if (!id) return
-    currentUserId.value = id
-    messages.value = await fetchUserMessages(id)
-  }
-
-  function addMessage(message) {
-    if (!message) return
-    messages.value.push(message)
-  }
-
-  function sendMessage(content) {
-    if (!content) return
-    const message = {
-      sender: 'me',
-      content
-    }
-    addMessage(message)
-    
-    // 持久化消息到messagesData
-    if (currentUserId.value && messagesData[currentUserId.value]) {
-      messagesData[currentUserId.value].push(message)
-    }
-  }
+  
 
   return {
     isLoading,
@@ -112,10 +68,7 @@ export const useServiceStore = defineStore('service', () => {
     currentUserId,
     messages,
     quickReplies,
-    currentUser,
-    setCurrentUser,
-    addMessage,
-    sendMessage,
+    messagesData,
     initData
   }
 })
