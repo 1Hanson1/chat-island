@@ -120,13 +120,13 @@ export function uploadUserDoc({ uid, kid, file }) {
 //
 
 // 获取所有用户（支持按类别筛选）
-export function getAllUsers({ category = "NORMAL" }) {
+export function getAllUsers({ category }) {
   return instance.get('/admin/user/get-all', { params: { category } });
 }
 
 // 通过用户名获取用户详情（含配额和VIP历史）
 export function getUserByName({ username }) {
-  return instance.get(`/admin/user/user/${username}`);
+  return instance.get(`/admin/user/get/${username}`);
 }
 
 // 通过用户ID获取用户详情
@@ -136,22 +136,22 @@ export function getUserById({ uid }) {
 
 // 创建新用户（可指定类别）
 export function createUser({ name, password, category = "NORMAL" }) {
-  return instance.post('/admin/user/user/add', { name, password, category });
+  return instance.post('/admin/user/add', { name, password, category });
 }
 
 // 更新用户信息（支持改名、改密码、变更类别）
 export function updateUser({ username, name, password, category, reason }) {
-  return instance.put(`/admin/user/user/${username}`, { name, password, category, reason });
+  return instance.put(`/admin/user/update/${username}`, { name, password, category, reason });
 }
 
 // 删除指定用户
 export function deleteUser({ username }) {
-  return instance.delete(`/admin/user/user/${username}`);
+  return instance.delete(`/admin/user/delete/${username}`);
 }
 
 // 获取用户模型调用记录（支持分页）
 export function getUserInvocations({ username, offset = 0, limit = 50 }) {
-  return instance.get(`/admin/user/user/${username}/invocations`, { params: { offset, limit } });
+  return instance.get(`/admin/user/user/invocations/${username}`, { params: { offset, limit } });
 }
 
 // 获取系统统计信息（用户数、VIP活跃数等）
@@ -168,7 +168,6 @@ export function triggerVipCheck() {
 export function getQuotaSummary({ category = "NORMAL" }) {
   return instance.get('/admin/user/quota-summary', { params: { category } });
 }
-
 
 // 移除指定用户的VIP状态
 export function removeUserVip({ uid }) {
