@@ -13,15 +13,17 @@ import {
   getChatStats,
   updateUser,
   removeUserVip,
-  deleteUser,
   renameChatSession,
   deleteChatSession,
   clearKbDocs,
   deleteUserKb,
-  deleteUserDoc
+  deleteUserDoc,
+  deleteAllUserKbs
  } from '../api/admin'
 import { stringify } from 'postcss'
 import { getSessionChat } from '../api/chatAi'
+import { deleteUser } from '../api/user'
+import { createKnowledge, uploadDocument, listKnowledge, deleteAllKnowledge } from '../api/knowledge'
 
 export const useManagerStore = defineStore('manager', () => {
   // 状态
@@ -119,7 +121,7 @@ export const useManagerStore = defineStore('manager', () => {
       }))
       // 转换API返回的knowledgeBases对象为数组格式
       users.value.find(u => u.uid === uid).knowledgeBases = Object.entries(rKnowledge.data.data.knowledgeBases).map(([kbId, kbData]) => ({
-        kid: kbId, // 去除kb_前缀
+        kid: kbId, 
         title: `知识库${kbId}`,
         files: []
       }))
@@ -182,6 +184,7 @@ export const useManagerStore = defineStore('manager', () => {
 
   // 设置当前文件
   async function setCurrentFile(docid) {
+    console.log('设置当前文件:', docid)
     if (docid === null) {
       currentFile.value = null
     } else {
@@ -203,6 +206,20 @@ export const useManagerStore = defineStore('manager', () => {
       console.error('获取系统统计信息失败:', error)
       throw error
     }
+  }
+
+  async function createNewKnowledgeBase(name = "1", tags = [], description = "") {
+    // await createKnowledge({ name, tags, description, uid: "1" })
+    const response = await listKnowledge({uid: "1"})
+    console.log(response.data)
+  }
+
+  async function uploadNewDocument(file) {
+    await uploadDocument({ kid: "kb_1", uid: "1", file })
+  }
+
+  async function deleteAllKnowledgeBases() {
+    await clearKbDocs({ uid: "1", kid: "kb_1" })
   }
 
   // 用户管理操作
@@ -233,7 +250,7 @@ export const useManagerStore = defineStore('manager', () => {
   async function downgradeUserToNormal() {
     if (!currentSelection.value) return
     try {
-      const response = await removeUserVip({ uid: currentSelection.value })
+      const response = await removeUserVip({ toRemover: users.value.find(u => u.uid === currentSelection.value).name, reason: '降级为普通用户' })
       await getUsers() // 刷新用户列表
       return response.data
     } catch (error) {
@@ -245,7 +262,7 @@ export const useManagerStore = defineStore('manager', () => {
   async function deleteCurrentUser() {
     if (!currentSelection.value) return
     try {
-      const response = await deleteUser({ username: currentSelection.value })
+      const response = await deleteUser({ name: users.value.find(u => u.uid === currentSelection.value).name })
       await getUsers() // 刷新用户列表
       clearSelection()
       return response.data
@@ -359,6 +376,9 @@ export const useManagerStore = defineStore('manager', () => {
     setCurrentFile,
 
     // 新增方法
+    createNewKnowledgeBase,
+    uploadNewDocument,
+    deleteAllKnowledgeBases,
     getSystemStatistics,
     getUserDetails,
     getUserChatStatistics,

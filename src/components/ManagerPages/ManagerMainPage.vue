@@ -94,11 +94,14 @@
             <n-button type="primary" block @click="managerStore.getSystemStatistics()">
               获取系统统计信息
             </n-button>
-            <n-button type="primary" block @click="">
+            <n-button type="primary" block @click="showUploadModal = true">
+              上传文档
+            </n-button>
+            <n-button type="primary" block @click="managerStore.createNewKnowledgeBase()">
               创建ai客服文件库
             </n-button>
-            <n-button type="primary" block @click="">
-              上传文档
+            <n-button type="primary" block @click="managerStore.deleteAllKnowledgeBases()">
+              清空知识库
             </n-button>
           </n-space>
         </n-card>
@@ -123,7 +126,7 @@
         <!-- 聊天记录操作区 -->
         <n-card v-if="managerStore.currentConversation" title="聊天记录管理" size="small">
           <n-space vertical>
-            <n-button type="primary" block @click="managerStore.renameCurrentConversation()">重命名</n-button>
+            <n-button type="primary" block @click="showRenameModal = true">重命名</n-button>
             <n-button type="error" block @click="managerStore.deleteCurrentConversation()">删除记录</n-button>
           </n-space>
         </n-card>
@@ -142,6 +145,46 @@
         </n-card>
       </n-card>
     </aside>
+
+    <n-modal v-model:show="showRenameModal" preset="dialog" title="重命名聊天记录">
+      <n-input 
+        v-model:value="renameInput" 
+        placeholder="请输入新的聊天记录名称" 
+        @keyup.enter="handleRename"
+      />
+      <template #action>
+        <n-button @click="handleRename" type="primary">确认</n-button>
+      </template>
+    </n-modal>
+
+    <n-modal v-model:show="showUploadModal">
+      <n-card
+        style="width: 600px"
+        title="上传文件"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+      >
+        <n-upload
+          multiple
+          directory-dnd
+          :max="5"
+          @change="handleFileUpload"
+        >
+          <n-upload-dragger>
+            <div style="margin-bottom: 12px">
+              <n-icon size="48" :depth="3">
+                <ArchiveOutline />
+              </n-icon>
+            </div>
+            <n-text style="font-size: 16px">
+              点击或者拖动文件到该区域来上传
+            </n-text>
+          </n-upload-dragger>
+        </n-upload>
+      </n-card>
+    </n-modal>
   </div>
   </n-config-provider>
 </template>
@@ -150,6 +193,7 @@
 import { useManagerStore } from '../../stores/ManagerStore'
 import { useAuthStore } from '../../stores/authStore'
 import { useRouter } from 'vue-router'
+import { ArchiveOutline } from '@vicons/ionicons5'
 import {
   NTabs,
   NTabPane,
@@ -159,9 +203,17 @@ import {
   NCard,
   NButton,
   NConfigProvider,
-  NTree
+  NTree,
+  NModal,
+  NInput,
+  NUpload,
+  NUploadDragger,
+  NIcon,
+  NText
 } from 'naive-ui'
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, ref } from 'vue'
+
+const baseURL = 'http://47.117.136.45:8113'
 
 const knowledgeTreeData = computed(() => {
   return managerStore.getCurrentKnowledgeBases.map(knowledge => ({
@@ -195,7 +247,8 @@ function handleKnowledgeSelect(keys) {
     managerStore.currentFile = null
     managerStore.setCurrentKnowledgeBase(kid)
   } else if (key.startsWith('file-')) {
-    const docid = key.split('-')[1]
+    const docid = key.split('-')[1] + '-' +key.split('-')[2] + '-' +key.split('-')[3] + '-' +key.split('-')[4] + '-' +key.split('-')[5]
+    console.log(docid)
     managerStore.currentFile = docid
   }
 }
@@ -203,6 +256,36 @@ function handleKnowledgeSelect(keys) {
 const managerStore = useManagerStore()
 const authStore = useAuthStore()
 const router = useRouter()
+
+const showRenameModal = ref(false)
+const renameInput = ref('')
+
+const handleRename = async () => {
+  if (renameInput.value.trim()) {
+    await managerStore.renameCurrentConversation(renameInput.value)
+    showRenameModal.value = false
+    renameInput.value = ''
+  }
+}
+
+const showUploadModal = ref(false)
+
+const handleFileUpload = async ({ fileList }) => {
+  if (!fileList || fileList.length === 0) return
+  if (!managerStore.currentKnowledgeBase) {
+    return
+  }
+
+  try {
+    for (const file of fileList) {
+      await managerStore.uploadNewDocument(file.file)
+      console.log("upload success")
+    }
+    showUploadModal.value = false
+  } catch (error) {
+    console.log("upload error")
+  }
+}
 
 onMounted(() => {
   managerStore.getUsers()
@@ -212,8 +295,6 @@ const handleLogout = () => {
   authStore.logout()
   router.push('/login')
 }
-
-//添加处
 </script>
 
 <style scoped>

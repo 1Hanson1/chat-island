@@ -8,11 +8,8 @@ export const useServiceStore = defineStore('service', () => {
   const error = ref(null)
 
   // 状态
-  const userList = ref([
-    { id: 1, name: '用户1', lastMessage: '你好，我有问题咨询' },
-    { id: 2, name: '用户2', lastMessage: '订单查询' }
-  ])
-  const currentUserId = ref(1)
+  const userList = ref([])
+  const currentUserId = ref(null)
   
   const messages = ref([])
   
@@ -32,16 +29,7 @@ export const useServiceStore = defineStore('service', () => {
   ])
 
   // 初始消息数据
-  const messagesData = {
-    1: [
-      { sender: 'user', content: '你好，我有问题咨询' },
-      { sender: 'me', content: '您好，请问有什么可以帮您？' }
-    ],
-    2: [
-      { sender: 'user', content: '我想查询我的订单状态' },
-      { sender: 'me', content: '请提供您的订单号' }
-    ]
-  }
+  const messagesData = {}
 
   // 初始化数据
   async function initData() {
@@ -51,7 +39,24 @@ export const useServiceStore = defineStore('service', () => {
       const uid = localStorage.getItem('uid')
       const response = await getCustomerInquiries(uid)
 
-      console.log(response.data)
+      // 处理API返回数据
+      const inquiries = response.data.data || []
+      userList.value = inquiries.map(inquiry => ({
+        id: inquiry.id,
+        name: inquiry.userUid || `用户${inquiry.id}`,
+        lastMessage: inquiry.messageContent || '新消息'
+      }))      // 初始化消息数据
+      inquiries.forEach(inquiry => {
+        messagesData[inquiry.id] ={
+          sender: 'user',
+          content: inquiry.messageContent || '新消息',
+        }
+      })
+      console.log(messagesData)
+      // 设置默认当前用户
+      if (inquiries.length > 0) {
+        setCurrentUser(inquiries[0].id)
+      }
     } catch (err) {
       error.value = err
     } finally {
@@ -59,7 +64,36 @@ export const useServiceStore = defineStore('service', () => {
     }
   }
 
-  
+  async function setCurrentUser(id) {
+    currentUserId.value = id
+    messages.value = []
+    messages.value.push({
+      sender: 'user',
+      content: messagesData[id].content
+    })
+  }
+
+  async function sendMessage(content) {
+    try {
+      isLoading.value = true
+      const uid = localStorage.getItem('uid')
+      await completeInquiry({
+        csUid: uid,
+        inquiryId: currentUserId.value,
+        replyMsg: content
+      })
+      
+      // 添加新消息到当前对话
+      messages.value.push({
+        sender: 'me',
+        content: content
+      })
+    } catch (err) {
+      error.value = err
+    } finally {
+      isLoading.value = false
+    }
+  }
 
   return {
     isLoading,
@@ -69,6 +103,8 @@ export const useServiceStore = defineStore('service', () => {
     messages,
     quickReplies,
     messagesData,
-    initData
+    setCurrentUser,
+    initData,
+    sendMessage
   }
 })

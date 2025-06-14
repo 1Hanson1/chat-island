@@ -46,7 +46,7 @@
       <n-layout-content class="bg-white">
         <div class="h-full flex flex-col">
           <div class="p-4 border-b">
-            <n-h2 class="text-blue-800">与 {{ serviceStore.currentUser?.name }} 的对话</n-h2>
+            <n-h2 class="text-blue-800">对话内容</n-h2>
           </div>
           
           <div class="flex-1 overflow-y-auto p-4" style="min-height: 0;">

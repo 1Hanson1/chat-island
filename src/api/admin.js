@@ -131,7 +131,7 @@ export function getUserByName({ username }) {
 
 // 通过用户ID获取用户详情
 export function getUserById({ uid }) {
-  return instance.get(`/admin/user/user/${uid}`);
+  return instance.get('/admin/user/get', { params: { uid } });
 }
 
 // 创建新用户（可指定类别）
@@ -170,6 +170,9 @@ export function getQuotaSummary({ category = "NORMAL" }) {
 }
 
 // 移除指定用户的VIP状态
-export function removeUserVip({ uid }) {
-  return instance.delete(`/admin/user/remove-vip`, { params: { uid } });
+export function removeUserVip(payload) {
+  return instance.post('/admin/user/remove-vip', {
+    username: payload.toRemover,
+    reason: payload.reason,
+  });
 }
