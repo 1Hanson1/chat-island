@@ -6,13 +6,13 @@
       class="w-[280px] border-r border-gray-200 flex flex-col px-4 bg-white shadow-sm"
     >
       <n-tabs type="line" animated class="mb-4">
-        <n-tab-pane name="users" tab="用户">
+        <n-tab-pane name="normalusers" tab="普通用户">
           <n-list class="mb-4">
             <n-list-item
               v-for="user in managerStore.users"
               :key="user.uid"
-              @click="managerStore.setCurrentSelection('user', user.uid)"
-              :class="{ 'bg-gray-100': managerStore.currentSelection.type === 'user' && managerStore.currentSelection.id === user.uid }"
+              @click="managerStore.setCurrentSelection(user.uid)"
+              :class="{ 'bg-gray-100': managerStore.currentSelection === user.uid }"
             >
               <n-thing :title="user.name" />
             </n-list-item>
@@ -56,18 +56,18 @@
       <div class="flex h-full">
         <!-- 内容显示区 -->
         <n-card
-          title="对话内容"
+          title="内容"
           class="flex-1 m-4"
           content-style="min-height: calc(100vh - 32px);"
         >
           <div v-if="managerStore.currentKnowledgeBase" class="p-4">
-            {{ managerStore.getCurrentKnowledgeBases.find(k => k.kid === managerStore.currentKnowledgeBase)?.content }}
+            {{ managerStore.getCurrentKnowledgeBases.find(k => k.kid === managerStore.currentKnowledgeBase)?.files }}
           </div>
           <div v-else-if="managerStore.currentConversation" class="p-4">
             {{ managerStore.getCurrentConversations.find(c => c.sessionId === managerStore.currentConversation)?.content }}
           </div>
           <div v-else-if="managerStore.currentFile" class="p-4">
-            {{ managerStore.getCurrentKnowledgeBases.find(k => k.kid === managerStore.currentKnowledgeBase)?.files.find(f => f.docid === managerStore.currentFile)?.content }}
+            {{ managerStore.getCurrentKnowledgeBases.find(k => k.kid === managerStore.currentKnowledgeBase)?.files.find(f => f.docid === managerStore.currentFile)?.content}}
           </div>
           <div v-else-if="managerStore.apiData" class="p-4 space-y-4">
             <n-card v-for="(data, index) in managerStore.apiData" :key="index" :title="data.title">
@@ -91,30 +91,30 @@
         <!-- 通用操作区 -->
         <n-card title="通用操作" size="small">
           <n-space vertical>
-            <n-button type="primary" block @click="">
+            <n-button type="primary" block @click="managerStore.getSystemStatistics()">
               获取系统统计信息
             </n-button>
             <n-button type="primary" block @click="">
-              上传ai客服文件库
+              创建ai客服文件库
+            </n-button>
+            <n-button type="primary" block @click="">
+              上传文档
             </n-button>
           </n-space>
         </n-card>
         <!-- 用户操作区 -->
-        <n-card v-if="managerStore.currentSelection.type" title="用户管理" size="small">
+        <n-card v-if="managerStore.currentSelection" title="用户管理" size="small">
           <n-space vertical>
-            <n-button type="primary" block @click="">
+            <n-button type="primary" block @click="managerStore.getUserDetails()">
               获取用户详细信息
             </n-button>
-            <n-button type="primary" block @click="">
+            <n-button type="primary" block @click="managerStore.getUserChatStatistics()">
               获取聊天统计信息
             </n-button>
-            <n-button type="primary" block @click="">
-              更新用户信息
-            </n-button>
-            <n-button type="warning" block @click="">
+            <n-button type="warning" block @click="managerStore.downgradeUserToNormal()">
               强制降为普通用户
             </n-button>
-            <n-button type="error" block @click="">
+            <n-button type="error" block @click="managerStore.deleteCurrentUser()">
               删除用户
             </n-button>
           </n-space>
@@ -123,22 +123,21 @@
         <!-- 聊天记录操作区 -->
         <n-card v-if="managerStore.currentConversation" title="聊天记录管理" size="small">
           <n-space vertical>
-            <n-button type="primary" block @click="">重命名</n-button>
-            <n-button type="error" block @click="">删除记录</n-button>
+            <n-button type="primary" block @click="managerStore.renameCurrentConversation()">重命名</n-button>
+            <n-button type="error" block @click="managerStore.deleteCurrentConversation()">删除记录</n-button>
           </n-space>
         </n-card>
+        <!-- 知识库操作区 -->
         <n-card v-else-if="managerStore.currentKnowledgeBase" title="知识库管理" size="small">
           <n-space vertical>
-            <n-button type="primary" block @click="">上传文档</n-button>
-            <n-button type="primary" block @click="">新建知识库</n-button>
-            <n-button type="error" block @click="">删除当前知识库</n-button>
+            <n-button type="primary" block @click="managerStore.clearCurrentKnowledgeBase()">清空当前知识库</n-button>
+            <n-button type="error" block @click="managerStore.deleteCurrentKnowledgeBase()">删除当前知识库</n-button>
           </n-space>
         </n-card>
         <!-- 文件操作 -->
         <n-card v-if="managerStore.currentFile" title="文件操作" size="small">
           <n-space vertical>
-            <n-button type="primary" block @click="downloadFile">下载文件</n-button>
-            <n-button type="error" block @click="deleteFile">删除文件</n-button>
+            <n-button type="error" block @click="managerStore.deleteCurrentFile()">删除文件</n-button>
           </n-space>
         </n-card>
       </n-card>
@@ -213,6 +212,8 @@ const handleLogout = () => {
   authStore.logout()
   router.push('/login')
 }
+
+//添加处
 </script>
 
 <style scoped>

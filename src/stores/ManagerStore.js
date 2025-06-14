@@ -2,10 +2,25 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { 
   getChatSessions,
-  getAllUsers,
   getChatSessionDetail,
-  // 这里添加其他API导入
+  getUserKbs,
+  getUserKbDocs,
+  getAllUsers,
+  getUserStatistics,
+  createUserKb,
+  uploadUserDoc,
+  getUserById,
+  getChatStats,
+  updateUser,
+  removeUserVip,
+  deleteUser,
+  renameChatSession,
+  deleteChatSession,
+  clearKbDocs,
+  deleteUserKb,
+  deleteUserDoc
  } from '../api/admin'
+import { stringify } from 'postcss'
 import { getSessionChat } from '../api/chatAi'
 
 export const useManagerStore = defineStore('manager', () => {
@@ -15,13 +30,14 @@ export const useManagerStore = defineStore('manager', () => {
       uid: 1,
       name: '用户1',
       conversations: [
-        { sessionId: 1, title: '与模型1的对话', content: '内容1' },
-        { sessionId: 2, title: '与模型2的对话', content: '内容2' }
+        { sessionId: 1, title: '与模型1的对话', content: [] },
+        { sessionId: 2, title: '与模型2的对话', content: [] }
       ],
       knowledgeBases: [
         { kid: 1, title: '产品文档', files: [{
           docid: 1,
           name: '产品文档.pdf',
+          content: 'https://www.example.com/product-doc.pdf'
         }] },
         { kid: 2, title: '使用指南', files: [] }
       ]
@@ -33,16 +49,13 @@ export const useManagerStore = defineStore('manager', () => {
   
   // 当前选择(id)
   const currentKnowledgeBase = ref(null)
-  const currentSelection = ref({
-    type: null, // 'user'
-    id: null
-  })
+  const currentSelection = ref(null)
   const currentConversation = ref(null)
   const currentFile = ref(null)
 
   const getCurrentConversations = computed(() => {
-    if (!currentSelection.value.type) return []
-    return users.value.find(u => u.uid === currentSelection.value.id)?.conversations || []
+    if (!currentSelection.value) return []
+    return users.value.find(u => u.uid === currentSelection.value)?.conversations || []
   })
 
   const getCurrentConversationContent = computed(() => {
@@ -51,8 +64,8 @@ export const useManagerStore = defineStore('manager', () => {
   })
 
   const getCurrentKnowledgeBases = computed(() => {
-    if (!currentSelection.value.type) return []
-    return users.value.find(u => u.uid === currentSelection.value.id)?.knowledgeBases || []
+    if (!currentSelection.value) return []
+    return users.value.find(u => u.uid === currentSelection.value)?.knowledgeBases || []
   })
 
   const getCurrentKnowledgeBaseFiles = computed(() => {
@@ -65,7 +78,16 @@ export const useManagerStore = defineStore('manager', () => {
     try {
       const responseN = await getAllUsers({ category: 'NORMAL' })
       const responseV = await getAllUsers({ category: 'VIP' })
-      console.log('获取用户列表成功:', responseN, responseV)
+      
+      // 合并普通用户和VIP用户数据
+      const mergedUsers = responseN.data.users.concat(responseV.data.users).map(user => ({
+        uid: user.uid,
+        name: user.name,
+        conversations: [],
+        knowledgeBases: []
+      }));
+      users.value = mergedUsers;
+      console.log('获取用户列表成功:', users.value)
     } catch (error) {
       console.error('获取用户列表:', error)
     }
@@ -79,29 +101,87 @@ export const useManagerStore = defineStore('manager', () => {
     currentFile.value = null
   }
 
-  //选择当前用户
-  function setCurrentSelection(type, id) {
-    currentSelection.value = { type, id }
+  //选择当前用户,同时挂载聊天记录，知识库列表
+  async function setCurrentSelection(uid) {
+    currentSelection.value = uid
     currentConversation.value = null
     currentKnowledgeBase.value = null
     currentFile.value = null
+    try{
+      const rChat = await getChatSessions({ uid })
+      const rKnowledge = await getUserKbs({ uid })
+      console.log('选择用户挂载聊天记录:', rChat.data.data)
+      console.log('选择用户挂载知识库列表:', rKnowledge.data.data)
+      users.value.find(u => u.uid === uid).conversations = rChat.data.data.map(c => ({
+        sessionId: c.memoryId,
+        title: c.name,
+        content: []
+      }))
+      // 转换API返回的knowledgeBases对象为数组格式
+      users.value.find(u => u.uid === uid).knowledgeBases = Object.entries(rKnowledge.data.data.knowledgeBases).map(([kbId, kbData]) => ({
+        kid: kbId, // 去除kb_前缀
+        title: `知识库${kbId}`,
+        files: []
+      }))
+      console.log('选择用户挂载成功:', users.value)
+    }
+    catch(error){
+      console.error('选择用户挂载失败:', error)
+    }
   }
-  //选择当前对话
-  function setCurrentConversation(id) {
-    currentConversation.value = id
+  //选择当前对话，同时挂载选择聊天记录具体内容
+  async function setCurrentConversation(sessionid) {
+    currentConversation.value = sessionid
     currentKnowledgeBase.value = null
     currentFile.value = null
+    try{
+      const rChat = await getSessionChat({ uid: currentSelection.value, sessionId: sessionid })
+      console.log('选择对话挂载聊天记录:', rChat.data)
+      if (rChat?.data) {
+        users.value.find(u => u.uid === currentSelection.value).conversations.find(c => c.sessionId === sessionid).content = rChat.data.map(msg => {
+          // 处理包含知识库和用户问题的消息
+          let processedContent = msg.text || '';
+          if (processedContent.includes('【知识库参考内容】') && processedContent.includes('【用户问题】')) {
+            const userQuestionPart = processedContent.split('【用户问题】：')[1] || '';
+            processedContent = userQuestionPart.split('\n')[0].trim();
+          }
+          
+          return {
+            id: msg.timestamp || Date.now(),
+            talker: msg.type === 'AI' ? 'ai' : 'user',
+            content: processedContent
+          }
+        })
+      }
+      console.log('选择对话挂载成功:', users.value)
+    }
+    catch(error){
+      console.error('选择对话失败:', error)
+    } 
   }
 
-  // 设置当前知识库
-  function setCurrentKnowledgeBase(id) {
-    currentKnowledgeBase.value = id
+  // 设置当前知识库,同时挂载选择知识库具体文件列表
+  async function setCurrentKnowledgeBase(kid) {
+    currentKnowledgeBase.value = kid
     currentConversation.value = null
     currentFile.value = null
+    try{
+      const rKnowledge = await getUserKbDocs({ uid: currentSelection.value, kid: kid })
+      console.log('选择知识库:', rKnowledge.data)
+      users.value.find(u => u.uid === currentSelection.value).knowledgeBases.find(k => k.kid === kid).files = rKnowledge.data.data.documents.map(doc => ({
+        docid: doc.docId,
+        name: doc.originalFilename,
+        content: []
+      }))
+      console.log('选择知识库挂载成功:', users.value)
+    }
+    catch(error){
+      console.error('选择知识库失败:', error)
+    }
   }
 
   // 设置当前文件
-  function setCurrentFile(docid) {
+  async function setCurrentFile(docid) {
     if (docid === null) {
       currentFile.value = null
     } else {
@@ -112,6 +192,151 @@ export const useManagerStore = defineStore('manager', () => {
 
   //操作面板
   
+
+  // 通用操作
+  async function getSystemStatistics() {
+    try {
+      const response = await getUserStatistics()
+      apiData.value = [{ title: '系统统计信息', content: response.data }]
+      return response.data
+    } catch (error) {
+      console.error('获取系统统计信息失败:', error)
+      throw error
+    }
+  }
+
+  // 用户管理操作
+  async function getUserDetails() {
+    if (!currentSelection.value) return
+    try {
+      const response = await getUserById({ uid: currentSelection.value })
+      apiData.value = [{ title: '用户详细信息', content: response.data }]
+      return response.data
+    } catch (error) {
+      console.error('获取用户详细信息失败:', error)
+      throw error
+    }
+  }
+
+  async function getUserChatStatistics() {
+    if (!currentSelection.value) return
+    try {
+      const response = await getChatStats({ uid: currentSelection.value })
+      apiData.value = [{ title: '用户聊天统计', content: response.data }]
+      return response.data
+    } catch (error) {
+      console.error('获取用户聊天统计失败:', error)
+      throw error
+    }
+  }
+
+  async function downgradeUserToNormal() {
+    if (!currentSelection.value) return
+    try {
+      const response = await removeUserVip({ uid: currentSelection.value })
+      await getUsers() // 刷新用户列表
+      return response.data
+    } catch (error) {
+      console.error('降级用户失败:', error)
+      throw error
+    }
+  }
+
+  async function deleteCurrentUser() {
+    if (!currentSelection.value) return
+    try {
+      const response = await deleteUser({ username: currentSelection.value })
+      await getUsers() // 刷新用户列表
+      clearSelection()
+      return response.data
+    } catch (error) {
+      console.error('删除用户失败:', error)
+      throw error
+    }
+  }
+
+  // 聊天记录管理
+  async function renameCurrentConversation(newName) {
+    if (!currentSelection.value || !currentConversation.value) return
+    try {
+      const response = await renameChatSession({
+        uid: currentSelection.value,
+        sessionId: currentConversation.value,
+        newName
+      })
+      await setCurrentSelection(currentSelection.value) // 刷新会话列表
+      return response.data
+    } catch (error) {
+      console.error('重命名会话失败:', error)
+      throw error
+    }
+  }
+
+  async function deleteCurrentConversation() {
+    if (!currentSelection.value || !currentConversation.value) return
+    try {
+      const response = await deleteChatSession({
+        uid: currentSelection.value,
+        sessionId: currentConversation.value
+      })
+      await setCurrentSelection(currentSelection.value) // 刷新会话列表
+      clearSelection()
+      return response.data
+    } catch (error) {
+      console.error('删除会话失败:', error)
+      throw error
+    }
+  }
+
+  // 知识库管理
+  async function clearCurrentKnowledgeBase() {
+    if (!currentSelection.value || !currentKnowledgeBase.value) return
+    try {
+      const response = await clearKbDocs({
+        uid: currentSelection.value,
+        kid: currentKnowledgeBase.value
+      })
+      await setCurrentKnowledgeBase(currentKnowledgeBase.value) // 刷新文件列表
+      return response.data
+    } catch (error) {
+      console.error('清空知识库失败:', error)
+      throw error
+    }
+  }
+
+  async function deleteCurrentKnowledgeBase() {
+    if (!currentSelection.value || !currentKnowledgeBase.value) return
+    try {
+      const response = await deleteUserKb({
+        uid: currentSelection.value,
+        kid: currentKnowledgeBase.value
+      })
+      await setCurrentSelection(currentSelection.value) // 刷新知识库列表
+      clearSelection()
+      return response.data
+    } catch (error) {
+      console.error('删除知识库失败:', error)
+      throw error
+    }
+  }
+
+  // 文件操作
+  async function deleteCurrentFile() {
+    if (!currentSelection.value || !currentFile.value) return
+    try {
+      const response = await deleteUserDoc({
+        uid: currentSelection.value,
+        docId: currentFile.value
+      })
+      await setCurrentKnowledgeBase(currentKnowledgeBase.value) // 刷新文件列表
+      clearSelection()
+      return response.data
+    } catch (error) {
+      console.error('删除文件失败:', error)
+      throw error
+    }
+  }
+
   return {
     users,
     getUsers,
@@ -133,6 +358,16 @@ export const useManagerStore = defineStore('manager', () => {
     setCurrentKnowledgeBase,
     setCurrentFile,
 
-
+    // 新增方法
+    getSystemStatistics,
+    getUserDetails,
+    getUserChatStatistics,
+    downgradeUserToNormal,
+    deleteCurrentUser,
+    renameCurrentConversation,
+    deleteCurrentConversation,
+    clearCurrentKnowledgeBase,
+    deleteCurrentKnowledgeBase,
+    deleteCurrentFile
   }
 })

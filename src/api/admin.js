@@ -22,7 +22,7 @@ export function getChatSessions({ uid }) {
 
 // 获取指定用户某个会话的详情及消息记录
 export function getChatSessionDetail({ uid, sessionId }) {
-  return instance.post('/admin/chat/session/get', { uid, sessionId });
+  return instance.get('/admin/chat/session/get', {params:{ uid, sessionId }});
 }
 
 // 删除某个用户的某个会话
