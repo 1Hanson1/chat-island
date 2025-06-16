@@ -138,6 +138,7 @@ import {
   NUploadDragger,
   NConfigProvider,
   NDynamicTags,
+  c,
 } from 'naive-ui';
 
 export default defineComponent({
@@ -196,6 +197,7 @@ export default defineComponent({
 
     const handleKbSelect = (keys: string[]) => {
       if (keys.length > 0) {
+        console.log('选择知识库:', keys[0])
         sourceGoDownStore.selectedKnowledgeBaseId = keys[0]
       }
     }
@@ -228,6 +230,7 @@ export default defineComponent({
       try {
         loading.value = true
         for (const file of fileList) {
+          console.log('上传文件:', file)
           await sourceGoDownStore.addDocument(
             sourceGoDownStore.selectedKnowledgeBaseId,
             file.file

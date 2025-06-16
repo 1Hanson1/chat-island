@@ -172,7 +172,7 @@ async function createHistory(){
       // 替换data:并去除所有空白字符
       aiResponse = aiResponse.replaceAll('data:', '')
       aiResponse = aiResponse.replaceAll(/\s/g, '')
-
+      console.log('aiResponse:', aiResponse)
       // addHistory(assistantId, 'ai', aiResponse)
       if(flag.value){
         flag.value = false

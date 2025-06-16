@@ -44,7 +44,7 @@ export function deleteDocument({ docId }) {
   return instance.delete('/delete-doc', { params: { docId } });
 }
 
-// 6. 文档上传接口（支持txt/pdf/doc/docx/md/html/htm格式）
+// 6. 文档上传接口
 export function uploadDocument({ kid, uid, file }) {
   const formData = new FormData();
   formData.append('file', file);

@@ -226,6 +226,7 @@ export const useManagerStore = defineStore('manager', () => {
   async function getUserDetails() {
     if (!currentSelection.value) return
     try {
+      clearSelection()
       const response = await getUserById({ uid: currentSelection.value })
       apiData.value = [{ title: '用户详细信息', content: response.data }]
       return response.data
@@ -238,6 +239,7 @@ export const useManagerStore = defineStore('manager', () => {
   async function getUserChatStatistics() {
     if (!currentSelection.value) return
     try {
+      clearSelection()
       const response = await getChatStats({ uid: currentSelection.value })
       apiData.value = [{ title: '用户聊天统计', content: response.data }]
       return response.data

@@ -38,7 +38,7 @@ export const useServiceStore = defineStore('service', () => {
       
       const uid = localStorage.getItem('uid')
       const response = await getCustomerInquiries(uid)
-
+      console.log(response)
       // 处理API返回数据
       const inquiries = response.data.data || []
       userList.value = inquiries.map(inquiry => ({
